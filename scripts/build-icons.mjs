@@ -19,7 +19,7 @@ const ICONS = [
   "analytics", "security", "health_and_safety", "privacy_tip", "account_circle", "menu", "refresh", "open_in_new",
   "content_copy", "mark_email_read", "sms", "wifi_off", "restart_alt", "draft", "send", "inbox", "pause_circle",
   "play_circle", "playlist_add_check", "clinical_notes", "medical_information", "contract", "how_to_reg",
-  "person_off", "content_paste_search", "markunread_mailbox", "language", "location_on", "circle", "upload", "done_all",
+  "person_off", "content_paste_search", "markunread_mailbox", "language", "location_on", "circle", "upload", "done_all", "family_restroom", "favorite", "monitor_heart", "local_pharmacy", "add_circle",
 ];
 
 const dir = "node_modules/@material-symbols/svg-400/rounded";

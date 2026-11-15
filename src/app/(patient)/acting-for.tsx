@@ -7,11 +7,11 @@ export function ActingForSwitcher({ current, options }: { current: string; optio
   const router = useRouter();
   const [pending, start] = useTransition();
   return (
-    <div className="rounded-md border border-line bg-surface p-3">
-      <label htmlFor="acting-for" className="eyebrow">Viewing records for</label>
+    <div className="rounded-lg bg-brand-50 p-3.5">
+      <label htmlFor="acting-for" className="text-xs font-semibold text-brand-700">Viewing records for</label>
       <select id="acting-for" disabled={pending} value={current}
         onChange={(e) => start(async () => { await setActingForAction(e.target.value); router.push("/dashboard"); router.refresh(); })}
-        className="mt-1.5 h-9 w-full rounded-sm border border-line-strong bg-surface px-2 text-sm">
+        className="mt-2 h-10 w-full rounded-full border border-brand-200 bg-surface px-3.5 text-sm font-semibold text-ink">
         {options.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
       </select>
     </div>

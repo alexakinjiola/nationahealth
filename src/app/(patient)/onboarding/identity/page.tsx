@@ -13,7 +13,7 @@ export default async function OnboardingIdentity() {
   return (
     <div className="mx-auto max-w-2xl animate-slide-up">
       <p className="eyebrow">Step 3 of 3 · Verify your identity</p>
-      <h1 className="mt-2 font-display text-[2.25rem] font-medium leading-tight text-ink">One last check</h1>
+      <h1 className="mt-2 text-[2rem] font-bold tracking-[-0.025em] leading-tight text-ink">One last check</h1>
       <p className="mt-2 text-[15px] leading-7 text-ink-3">
         Verifying your identity stops anyone else creating a record in your name, and lets hospitals send your records to the right person.
       </p>

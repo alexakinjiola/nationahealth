@@ -8,7 +8,7 @@ export default function RegisterPage() {
   return (
     <div className="animate-slide-up">
       <p className="eyebrow">Step 1 of 3 · Your details</p>
-      <h1 className="mt-2 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Create your health record</h1>
+      <h1 className="mt-2 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">Create your health record</h1>
       <p className="mt-2 text-[15px] text-ink-3">It's free, and nothing is shared with any hospital unless you approve it.</p>
       <div className="mt-8"><RegisterForm /></div>
       <p className="mt-8 border-t border-line pt-6 text-sm text-ink-3">

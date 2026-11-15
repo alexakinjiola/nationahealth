@@ -13,7 +13,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   if (actor && (!actor.mfaEnabled || actor.mfaVerified)) redirect(homeFor(actor));
   return (
     <div className="animate-slide-up">
-      <h1 className="font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Welcome back</h1>
+      <h1 className="text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">Welcome back</h1>
       <p className="mt-2 text-[15px] text-ink-3">Sign in to see your records and manage who can access them.</p>
       <div className="mt-8 space-y-5">
         {sp.signed_out && <Callout tone="success" role="status">You've been signed out.</Callout>}

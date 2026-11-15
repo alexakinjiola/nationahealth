@@ -7,7 +7,7 @@ export function TabsNav({ tabs, current, label }: {
 }) {
   return (
     <nav aria-label={label} className="-mx-1 overflow-x-auto">
-      <ul className="flex min-w-max gap-1 border-b border-line px-1">
+      <ul className="inline-flex min-w-max gap-1 rounded-full border border-line/80 bg-surface p-1 shadow-xs">
         {tabs.map((t) => {
           const active = t.key === current;
           return (
@@ -16,13 +16,13 @@ export function TabsNav({ tabs, current, label }: {
                 href={t.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative -mb-px inline-flex h-11 items-center gap-2 border-b-2 px-3 text-sm font-medium transition-colors",
-                  active ? "border-brand-600 text-ink" : "border-transparent text-ink-3 hover:border-line-strong hover:text-ink",
+                  "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors",
+                  active ? "bg-brand-600 text-white" : "text-ink-3 hover:bg-brand-50 hover:text-brand-700",
                 )}
               >
                 {t.label}
                 {t.count !== undefined && (
-                  <span className={cn("rounded-full px-1.5 text-xs tabular leading-5", active ? "bg-brand-50 text-brand-700" : "bg-sunken text-ink-3")}>
+                  <span className={cn("rounded-full px-1.5 text-xs tabular leading-5", active ? "bg-white/20 text-white" : "bg-sunken text-ink-3")}>
                     {t.count}
                   </span>
                 )}

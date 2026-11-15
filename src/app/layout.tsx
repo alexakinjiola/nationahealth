@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import "@fontsource-variable/schibsted-grotesk";
+import "@fontsource-variable/plus-jakarta-sans";
 import "@fontsource-variable/newsreader";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport: Viewport = { themeColor: "#f6f4ef", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#f5f8fd", width: "device-width", initialScale: 1 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Reading the nonce makes every page dynamic, which per-request CSP nonces require.

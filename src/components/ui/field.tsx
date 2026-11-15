@@ -42,7 +42,7 @@ export function Field({
 }
 
 export const controlClass =
-  "block w-full rounded-md border bg-surface px-3 text-[15px] text-ink shadow-xs transition-colors placeholder:text-placeholder hover:border-ink-3/60 focus-visible:border-brand-600 focus-visible:outline-2 focus-visible:outline-brand-600/25 disabled:cursor-not-allowed disabled:bg-sunken disabled:text-ink-3 aria-[invalid=true]:border-danger-600 aria-[invalid=true]:focus-visible:outline-danger-600/25";
+  "block w-full rounded-md border bg-surface px-3.5 text-[15px] text-ink shadow-xs transition-colors placeholder:text-placeholder hover:border-brand-300 focus-visible:border-brand-600 focus-visible:outline-2 focus-visible:outline-brand-600/25 disabled:cursor-not-allowed disabled:bg-sunken disabled:text-ink-3 aria-[invalid=true]:border-danger-600 aria-[invalid=true]:focus-visible:outline-danger-600/25";
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
   { className, ...props }, ref,

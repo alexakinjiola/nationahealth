@@ -15,7 +15,7 @@ export default async function MfaPage({ searchParams }: { searchParams: Promise<
   return (
     <div className="animate-slide-up">
       <span className="grid size-12 place-items-center rounded-full bg-brand-50 text-brand-700"><Icon name="password" size={26} /></span>
-      <h1 className="mt-6 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Enter your code</h1>
+      <h1 className="mt-6 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">Enter your code</h1>
       <p className="mt-2 text-[15px] text-ink-3">Open your authenticator app and enter the 6-digit code for {process.env.NEXT_PUBLIC_PLATFORM_NAME ?? "Continuum"}.</p>
       <div className="mt-8"><OtpForm action={mfaChallengeAction} submitLabel="Verify and continue" next={next} /></div>
       <div className="mt-8 border-t border-line pt-6 text-sm text-ink-3">

@@ -28,7 +28,7 @@ export default async function RequestPage({ params }: { params: Promise<{ id: st
       <Link href="/access" className="inline-flex items-center gap-1 text-sm font-medium text-ink-3 hover:text-ink"><Icon name="arrow_back" size={18} />Access & sharing</Link>
       <header className="mt-4 pb-6">
         <p className="eyebrow">Access request · <span className="font-mono normal-case tracking-normal">{r.reference}</span></p>
-        <h1 className="mt-2 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">{r.institution.name} wants to see some of your records</h1>
+        <h1 className="mt-2 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">{r.institution.name} wants to see some of your records</h1>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge tone={REQUEST_STATUS[r.status]?.tone}>{REQUEST_STATUS[r.status]?.label}</Badge>
           <span className="text-sm text-ink-3">Sent {formatDateTime(r.created_at)}{open ? ` · expires in ${plural(Math.max(daysUntil(r.respond_by), 0), "day")}` : ""}</span>

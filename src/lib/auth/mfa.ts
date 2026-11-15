@@ -11,7 +11,7 @@ export function newTotpSecret() {
 
 export async function totpQrDataUrl(secret: string, label: string) {
   const uri = generateURI({ issuer: ISSUER, label, secret });
-  return QRCode.toDataURL(uri, { margin: 1, width: 220, color: { dark: "#13233A", light: "#FFFFFF" } });
+  return QRCode.toDataURL(uri, { margin: 1, width: 220, color: { dark: "#0B347A", light: "#FFFFFF" } });
 }
 
 export async function verifyTotp(encryptedSecret: string, userId: string, code: string) {

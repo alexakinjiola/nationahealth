@@ -16,7 +16,7 @@ export default function Recovery() {
   return (
     <PublicShell>
       <article className="mx-auto max-w-2xl px-5 py-12 sm:px-8">
-        <h1 className="font-display text-[2.25rem] font-medium text-ink">Getting back into your account</h1>
+        <h1 className="text-[2rem] font-bold tracking-[-0.025em] text-ink">Getting back into your account</h1>
         <dl className="mt-10 space-y-8">
           {CASES.map(([q, a]) => <div key={q}><dt className="text-lg font-semibold text-ink">{q}</dt><dd className="mt-2 leading-7 text-ink-2">{a}</dd></div>)}
         </dl>

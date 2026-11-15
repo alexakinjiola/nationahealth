@@ -27,7 +27,7 @@ export default function ResetPasswordPage({ params }: { params: Promise<{ token:
   }));
   return (
     <div className="animate-slide-up">
-      <h1 className="font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Choose a new password</h1>
+      <h1 className="text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">Choose a new password</h1>
       <p className="mt-2 text-[15px] text-ink-3">For your security, every device signed in to your account will be signed out.</p>
       <form onSubmit={onSubmit} noValidate className="mt-8 space-y-5">
         <FormError message={error} />

@@ -32,14 +32,14 @@ export function AppShell({
       {synthetic && <SyntheticBanner />}
       {banner}
       <div className="lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
-        <aside className={cn("no-print sticky top-0 hidden h-dvh flex-col px-4 py-5 lg:flex", dark ? "bg-navy-900" : "border-r border-line bg-canvas")}>
+        <aside className={cn("no-print sticky top-0 hidden h-dvh flex-col px-4 py-5 lg:flex", dark ? "bg-navy-900" : "border-r border-line/80 bg-surface")}>
           <Logo href={home} inverted={dark} suffix={logoSuffix} className="px-2" />
           {sidebarTop && <div className="mt-6">{sidebarTop}</div>}
           <nav aria-label="Main" className="mt-6 flex-1 overflow-y-auto"><SideNav items={nav} dark={dark} /></nav>
           {sidebarFooter && <div className="mt-4">{sidebarFooter}</div>}
         </aside>
         <div className="min-w-0">
-          <header className={"no-print sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-canvas/90 px-4 backdrop-blur sm:px-6 lg:px-10"}>
+          <header className={"no-print sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line/80 bg-surface/85 px-4 backdrop-blur-md sm:px-6 lg:px-10"}>
             <MobileDrawer items={nav} dark={dark} header={<Logo href={home} inverted={dark} suffix={logoSuffix} />} footer={sidebarTop} />
             <div className="lg:hidden"><Logo href={home} suffix={logoSuffix} /></div>
             <div className="ml-auto flex items-center gap-1.5">{topRight}</div>

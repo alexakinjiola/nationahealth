@@ -26,11 +26,11 @@ const KIND: Record<string, { icon: IconName; tone: string }> = {
   viewed: { icon: "visibility", tone: "bg-info-bg text-info-fg" },
   downloaded: { icon: "download", tone: "bg-info-bg text-info-fg" },
   exported: { icon: "download", tone: "bg-sunken text-ink-2" },
-  submitted: { icon: "upload_file", tone: "bg-brand-50 text-brand-700" },
+  submitted: { icon: "upload_file", tone: "bg-accent-50 text-accent-700" },
   blocked: { icon: "block", tone: "bg-danger-bg text-danger-fg" },
   emergency: { icon: "emergency", tone: "bg-danger-bg text-danger-fg" },
   request: { icon: "pending_actions", tone: "bg-warning-bg text-warning-fg" },
-  permission: { icon: "shield_person", tone: "bg-brand-50 text-brand-700" },
+  permission: { icon: "shield_person", tone: "bg-accent-50 text-accent-700" },
   record: { icon: "description", tone: "bg-sunken text-ink-2" },
   lookup: { icon: "person_search", tone: "bg-sunken text-ink-2" },
   other: { icon: "history", tone: "bg-sunken text-ink-2" },
@@ -50,7 +50,7 @@ export function ActivityItem({ a, action, compact }: { a: ActivityRow; action?: 
   const k = KIND[a.kind] ?? KIND.other;
   return (
     <li className={cn("flex gap-4", compact ? "py-3" : "px-5 py-4 sm:px-6")}>
-      <span className={cn("grid size-9 shrink-0 place-items-center rounded-md", k.tone)}><Icon name={k.icon} size={18} /></span>
+      <span className={cn("grid size-10 shrink-0 place-items-center rounded-full", k.tone)}><Icon name={k.icon} size={18} /></span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium leading-6 text-ink">{describeActivity(a)}</p>
         <p className="text-[13px] text-ink-3">

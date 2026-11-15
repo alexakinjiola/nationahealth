@@ -24,23 +24,24 @@ export function HealthIdChip({ value, className, inverted }: { value: string; cl
   );
 }
 
-/** The Health ID presented like a membership card — the one thing a patient shares at reception. */
+/** The Health ID as a frosted card — the one thing a patient shares at reception. Sits on the blue welcome banner. */
 export function HealthIdCard({ value, name }: { value: string; name: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="relative w-full overflow-hidden rounded-lg bg-brand-800 px-5 py-4 text-white shadow-md sm:w-[300px]">
-      <div aria-hidden className="pointer-events-none absolute -right-10 -top-12 size-40 rounded-full border border-white/10" />
-      <div aria-hidden className="pointer-events-none absolute -right-2 -top-4 size-24 rounded-full border border-white/10" />
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-brand-200">Health ID</p>
-      <p className="mt-2 font-mono text-[19px] font-medium tracking-[0.08em]">{formatHealthId(value)}</p>
-      <div className="mt-3 flex items-center justify-between">
+    <div className="relative w-full overflow-hidden rounded-lg bg-white/[0.12] px-5 py-4 text-white ring-1 ring-white/25 backdrop-blur-md sm:w-[300px]">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-100">Health ID</p>
+        <Icon name="id_card" size={20} className="text-brand-100" />
+      </div>
+      <p className="mt-2 font-mono text-[20px] font-medium tracking-[0.08em]">{formatHealthId(value)}</p>
+      <div className="mt-2 flex items-center justify-between gap-2">
         <p className="truncate text-[13px] text-brand-100">{name}</p>
         <button
           type="button"
           onClick={async () => { await navigator.clipboard?.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-          className="-mr-1.5 inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-brand-100 hover:bg-white/10 hover:text-white"
+          className="-mr-2 inline-flex h-8 items-center gap-1.5 rounded-full bg-white/15 px-3 text-xs font-semibold text-white hover:bg-white/25"
         >
-          <Icon name={copied ? "check" : "content_copy"} size={16} />{copied ? "Copied" : "Copy"}
+          <Icon name={copied ? "check" : "content_copy"} size={15} />{copied ? "Copied" : "Copy"}
           <span className="sr-only"> Health ID</span>
         </button>
       </div>
