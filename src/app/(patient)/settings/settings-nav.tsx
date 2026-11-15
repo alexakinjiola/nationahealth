@@ -8,6 +8,7 @@ export function SettingsNav({ current }: { current: string }) {
         { key: "identity", label: "Identity", href: "/settings/identity" },
         { key: "security", label: "Security", href: "/settings/security" },
         { key: "notifications", label: "Notifications", href: "/settings/notifications" },
+        { key: "phone", label: "Phone access", href: "/settings/phone" },
         { key: "representatives", label: "Representatives", href: "/settings/representatives" },
         { key: "privacy", label: "Privacy & data", href: "/settings/privacy" },
       ]} />

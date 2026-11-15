@@ -38,6 +38,9 @@ const schema = z.object({
   SMS_WEBHOOK_URL: z.preprocess((v) => (v === "" ? undefined : v), z.string().url().optional()),
   SMS_WEBHOOK_TOKEN: z.string().optional(),
   ENABLE_DEV_MAILBOX: z.string().default("false"),
+  // Shared secret in the USSD/SMS callback URL (?key=…). Unset = phone access off.
+  PHONE_WEBHOOK_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().min(16).optional()),
+  USSD_SERVICE_CODE: z.string().optional(),
 });
 
 type Env = z.infer<typeof schema> & { APP_ENV: "development" | "staging" | "production" };

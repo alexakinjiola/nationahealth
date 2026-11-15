@@ -6,6 +6,7 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toast";
+import { getLang } from "@/lib/i18n/server";
 
 const name = process.env.NEXT_PUBLIC_PLATFORM_NAME ?? "Continuum";
 
@@ -18,10 +19,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#f5f8fd", width: "device-width", initialScale: 1 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const lang = await getLang();
   // Reading the nonce makes every page dynamic, which per-request CSP nonces require.
   await headers();
   return (
-    <html lang="en-NG">
+    <html lang={lang === "en" ? "en-NG" : lang}>
       <body>
         {children}
         <Toaster />

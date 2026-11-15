@@ -19,6 +19,7 @@ export default async function ProviderLayout({ children }: { children: React.Rea
   const nav: NavItem[] = [{ href: "/provider", label: "Overview", icon: "dashboard", exact: true }];
   if (can("access:request")) nav.push({ href: "/provider/search", label: "Patient search", icon: "person_search" }, { href: "/provider/requests", label: "Access requests", icon: "pending_actions", badge: c.pending });
   if (can("records:view_authorized")) nav.push({ href: "/provider/patients", label: "Authorised patients", icon: "clinical_notes" });
+  if (can("records:view_authorized")) nav.push({ href: "/provider/referrals", label: "Referrals", icon: "send" });
   if (can("records:submit")) nav.push({ href: "/provider/submit", label: "Submit a record", icon: "upload_file" }, { href: "/provider/submissions", label: "Record submissions", icon: "receipt_long" });
   if (can("staff:manage")) nav.push({ href: "/provider/staff", label: "Staff management", icon: "group" });
   if (current && current.capabilities.includes("institution:manage") || actor.ownedInstitutionDrafts.length) nav.push({ href: "/provider/institution", label: "Institution settings", icon: "domain" });

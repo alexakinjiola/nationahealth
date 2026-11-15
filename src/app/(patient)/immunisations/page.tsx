@@ -12,6 +12,7 @@ import { ProgressRing, Reveal } from "@/components/ui/motion";
 import { NPI_SCHEDULE, weeksSince, type Dose } from "@/lib/nigeria";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { ReminderDialog } from "../reminders/form";
 
 export const metadata: Metadata = { title: "Immunisations" };
 
@@ -21,7 +22,7 @@ const ageLabel = (w: number) => (w === 0 ? "At birth" : w < 52 ? `${w} weeks` : 
 export default async function ImmunisationsPage() {
   const { actor, patientId, actingAs } = await requirePatientContext("/immunisations");
   const d = await withActor(actor.userId, async (tx) => ({
-    p: (await tx<{ full_name: string; date_of_birth: string; sex: string }[]>`select full_name, date_of_birth, sex from patient_profiles where patient_id = ${patientId}`)[0],
+    p: (await tx<{ full_name: string; date_of_birth: string; sex: string; phone: string | null }[]>`select full_name, date_of_birth, sex, phone from patient_profiles where patient_id = ${patientId}`)[0],
     vax: await tx<{ id: string; title: string; clinical_date: string | null; institution: string | null }[]>`
       select r.id, r.title, r.clinical_date, i.name as institution from medical_records r left join healthcare_institutions i on i.id = r.institution_id
       where r.patient_id = ${patientId} and r.category_key = 'vaccination' and r.status <> 'entered_in_error' order by r.clinical_date nulls last`,
@@ -94,7 +95,8 @@ export default async function ImmunisationsPage() {
                         <p className="text-[13px] text-ink-3">Protects against {r.dose.prevents.toLowerCase()}</p>
                         <div className="mt-2">{r.rec
                           ? <Badge tone="success" icon="check_circle">Given {formatDate(r.rec.clinical_date)}{r.rec.institution ? ` · ${r.rec.institution}` : ""}</Badge>
-                          : r.status === "upcoming" ? <Badge tone="neutral">Upcoming</Badge>
+                          : r.status === "upcoming" ? <span className="flex flex-wrap items-center gap-2"><Badge tone="neutral">Upcoming</Badge>{isChild && <ReminderDialog hasPhone={!!d.p.phone}
+                            preset={{ kind: "immunisation", title: `${first}: ${r.dose.vaccine} ${r.dose.dose}`, appointmentAt: `${r.due.toISOString().slice(0, 10)}T09:00` }} />}</span>
                           : r.status === "due" ? <Badge tone="warning">Due now</Badge>
                           : <Badge tone={isChild ? "danger" : "neutral"}>{isChild ? "Not recorded" : "No record"}</Badge>}</div>
                       </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image, { type StaticImageData } from "next/image";
 import { PublicShell } from "@/components/shell/public-shell";
 import { withService } from "@/lib/db";
+import { getT } from "@/lib/i18n/server";
 import { CountUp, Reveal } from "@/components/ui/motion";
 import { ConsentDemo } from "@/components/marketing/consent-demo";
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,8 @@ function SectionHeading({ eyebrow, title, accent, children, center, id }: { eyeb
 }
 
 export default async function Landing() {
+  const t = await getT();
+  const quick = QUICK.map((q, i) => ({ ...q, ...[{ title: t("quick.create"), body: t("quick.createBody") }, { title: t("quick.share"), body: t("quick.shareBody") }, { title: t("quick.views"), body: t("quick.viewsBody") }][i] }));
   const [live] = await withService((tx) => tx<{ facilities: number; states: number; patients: number; records: number }[]>`
     select (select count(*)::int from healthcare_institutions where status = 'approved') as facilities,
            (select count(distinct state)::int from healthcare_institutions where status = 'approved') as states,
@@ -90,18 +93,18 @@ export default async function Landing() {
         <div className="relative mx-auto grid max-w-[1240px] items-center gap-12 px-5 pb-36 pt-10 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:pb-44 lg:pt-14">
           <div className="animate-slide-up">
             <p className="inline-flex items-center gap-2 rounded-full bg-surface px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.1em] text-brand-700 shadow-card ring-1 ring-line/70">
-              <Icon name="health_and_safety" size={16} className="text-accent-600" />Your records · Your say
+              <Icon name="health_and_safety" size={16} className="text-accent-600" />{t("hero.eyebrow")}
             </p>
             <h1 className="mt-7 text-[2.75rem] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink sm:text-[4rem]">
-              Your health records,
-              <span className="mt-1 block font-display text-[3.1rem] font-normal italic leading-[1.05] tracking-[-0.02em] text-accent-600 sm:text-[4.5rem]">wherever life takes you.</span>
+              {t("hero.title")}
+              <span className="mt-1 block font-display text-[3.1rem] font-normal italic leading-[1.05] tracking-[-0.02em] text-accent-600 sm:text-[4.5rem]">{t("hero.accent")}</span>
             </h1>
             <p className="mt-6 max-w-[33rem] text-lg leading-8 text-ink-2">
-              Diagnoses, results and prescriptions from every hospital you visit, kept together in one secure place. Nobody sees them unless you say so.
+              {t("hero.body")}
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button asChild size="lg" className="pr-2"><Link href="/register">Create your free record<span className="ml-1 grid size-9 place-items-center rounded-full bg-white/20"><Icon name="arrow_forward" size={20} /></span></Link></Button>
-              <Button asChild size="lg" variant="secondary"><Link href="/register/provider">For hospitals & labs</Link></Button>
+              <Button asChild size="lg" className="pr-2"><Link href="/register">{t("hero.cta")}<span className="ml-1 grid size-9 place-items-center rounded-full bg-white/20"><Icon name="arrow_forward" size={20} /></span></Link></Button>
+              <Button asChild size="lg" variant="secondary"><Link href="/register/provider">{t("hero.ctaInstitutions")}</Link></Button>
             </div>
           </div>
 
@@ -131,13 +134,13 @@ export default async function Landing() {
       {/* Floating quick-start bar */}
       <section aria-label="Get started" className="relative z-10 mx-auto -mt-24 max-w-[1100px] px-5 sm:px-8">
         <div className="grid gap-2 rounded-xl bg-surface p-3 shadow-lg ring-1 ring-line/70 md:grid-cols-[1fr_1fr_1fr_auto] md:items-center">
-          {QUICK.map((q, i) => (
+          {quick.map((q, i) => (
             <Link key={q.title} href={q.href} className={`group flex items-center gap-4 rounded-lg px-4 py-3.5 transition-colors hover:bg-brand-50/70 ${i > 0 ? "md:border-l md:border-line md:rounded-l-none" : ""}`}>
               <span className="grid size-12 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white"><Icon name={q.icon} size={22} /></span>
               <span><span className="block text-[15px] font-bold text-ink">{q.title}</span><span className="block text-[13px] text-ink-3">{q.body}</span></span>
             </Link>
           ))}
-          <Button asChild size="lg" className="m-1"><Link href="/register">Get started<Icon name="arrow_forward" size={20} /></Link></Button>
+          <Button asChild size="lg" className="m-1"><Link href="/register">{t("quick.start")}<Icon name="arrow_forward" size={20} /></Link></Button>
         </div>
       </section>
 

@@ -3,14 +3,16 @@ import { Logo } from "./logo";
 import { SkipLink } from "./skip-link";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { getT } from "@/lib/i18n/server";
+import type { MessageKey } from "@/lib/i18n/dictionaries";
+import { LanguageSwitcher } from "./language-switcher";
 
-const NAV: [string, string][] = [
-  ["Home", "/"],
-  ["How it works", "/#how"],
-  ["Patients", "/#who"],
-  ["Find a facility", "/facilities"],
-  ["Institutions", "/#institutions"],
-  ["Privacy", "/privacy"],
+const NAV: [MessageKey, string][] = [
+  ["nav.home", "/"],
+  ["nav.how", "/#how"],
+  ["nav.facilities", "/facilities"],
+  ["nav.institutions", "/#institutions"],
+  ["nav.privacy", "/privacy"],
 ];
 
 const FOOTER: { title: string; links: [string, string][] }[] = [
@@ -19,7 +21,8 @@ const FOOTER: { title: string; links: [string, string][] }[] = [
   { title: "Trust", links: [["Find a verified facility", "/facilities"], ["Privacy notice", "/privacy"], ["Your rights", "/privacy"]] },
 ];
 
-export function PublicShell({ children, current }: { children: React.ReactNode; current?: string }) {
+export async function PublicShell({ children, current }: { children: React.ReactNode; current?: string }) {
+  const t = await getT();
   return (
     <div className="min-h-dvh bg-surface">
       <SkipLink />
@@ -27,7 +30,8 @@ export function PublicShell({ children, current }: { children: React.ReactNode; 
         <div className="mx-auto flex h-20 max-w-[1240px] items-center justify-between gap-3 px-4 sm:px-8">
           <Logo />
           <nav aria-label="Site" className="hidden items-center gap-1 lg:flex">
-            {NAV.map(([label, href]) => {
+            {NAV.map(([key, href]) => {
+              const label = t(key);
               const active = href === current;
               return (
                 <Link key={label} href={href} aria-current={active ? "page" : undefined}
@@ -41,10 +45,11 @@ export function PublicShell({ children, current }: { children: React.ReactNode; 
           <nav aria-label="Account" className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Link href="/sign-in" className="hidden items-center gap-2.5 rounded-full py-1 pl-1 pr-3 text-sm font-semibold text-ink hover:text-brand-600 sm:inline-flex">
               <span className="grid size-9 place-items-center rounded-full bg-surface text-brand-600 shadow-card ring-1 ring-line/80"><Icon name="person" size={20} /></span>
-              Sign in
+              {t("nav.signIn")}
             </Link>
-            <Link href="/sign-in" className="inline-flex h-9 items-center rounded-full px-3 text-[13px] font-semibold text-ink sm:hidden">Sign in</Link>
-            <Button asChild size="sm"><Link href="/register" aria-label="Create account"><span className="hidden min-[380px]:inline">Create account</span><span aria-hidden className="min-[380px]:hidden">Join</span></Link></Button>
+            <LanguageSwitcher current={t.lang} label={t("nav.language")} className="hidden md:inline-flex" />
+            <Link href="/sign-in" className="inline-flex h-9 items-center rounded-full px-3 text-[13px] font-semibold text-ink sm:hidden">{t("nav.signIn")}</Link>
+            <Button asChild size="sm"><Link href="/register" aria-label={t("nav.createAccount")}><span className="hidden min-[380px]:inline">{t("nav.createAccount")}</span><span aria-hidden className="min-[380px]:hidden">+</span></Link></Button>
           </nav>
         </div>
       </header>
@@ -67,6 +72,7 @@ export function PublicShell({ children, current }: { children: React.ReactNode; 
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-[1240px] flex-col gap-2 px-5 py-6 text-[13px] text-navy-300 sm:flex-row sm:justify-between sm:px-8">
             <p>Pilot service. Examples on this site use synthetic data.</p>
+            <LanguageSwitcher current={t.lang} label={t("nav.language")} dark className="self-start md:hidden" />
             <p>Photography via Unsplash.</p>
           </div>
         </div>

@@ -15,9 +15,40 @@ import { RecordRow, type RecordRowData } from "@/components/domain/record-row";
 import { BASIS, CATEGORY, DENIAL_REASON, PURPOSE } from "@/lib/labels";
 import { age, formatDate, formatDateTime } from "@/lib/format";
 import { formatHealthId } from "@/lib/validation/common";
+import { ReferDialog } from "./refer";
 
 export const metadata: Metadata = { title: "Patient records" };
 export const dynamic = "force-dynamic";
+
+type EmergencyProfile = { blood_group: string; genotype: string; allergies: string | null; chronic_conditions: string[]; current_medications: string | null;
+  nhia_number: string | null; hmo_name: string | null; organ_donor: boolean; pregnant: boolean | null; disabilities: string | null; updated_at: string;
+  emergency_contact: { name: string | null; phone: string | null; relationship: string | null } | null };
+
+function EmergencyProfileCard({ profile }: { profile: EmergencyProfile | null }) {
+  if (!profile) return (
+    <Card><CardBody className="flex gap-3 text-sm text-ink-3"><Icon name="emergency_home" size={20} className="shrink-0" />The patient hasn't shared an emergency profile.</CardBody></Card>
+  );
+  const known = (v: string) => (v && v !== "unknown" ? v : "?");
+  return (
+    <section aria-labelledby="ep-title" className="overflow-hidden rounded-lg bg-gradient-to-br from-danger-600 to-[#7a1810] p-5 text-white shadow-md">
+      <h2 id="ep-title" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-white/85"><Icon name="emergency" size={16} />Emergency profile</h2>
+      <dl className="mt-3 grid grid-cols-2 gap-2">
+        <div className="rounded-md bg-white/15 p-2.5"><dt className="text-[11px] uppercase text-white/75">Blood</dt><dd className="text-xl font-extrabold">{known(profile.blood_group)}</dd></div>
+        <div className="rounded-md bg-white/15 p-2.5"><dt className="text-[11px] uppercase text-white/75">Genotype</dt><dd className="text-xl font-extrabold">{known(profile.genotype)}</dd></div>
+      </dl>
+      <dl className="mt-3 space-y-1.5 text-sm">
+        <div><dt className="inline font-semibold">Allergies: </dt><dd className="inline text-white/90">{profile.allergies ?? "None recorded"}</dd></div>
+        <div><dt className="inline font-semibold">Conditions: </dt><dd className="inline text-white/90">{profile.chronic_conditions.join(", ") || "None recorded"}</dd></div>
+        {profile.current_medications && <div><dt className="inline font-semibold">Medicines: </dt><dd className="inline text-white/90">{profile.current_medications}</dd></div>}
+        {profile.pregnant && <div className="font-semibold">Currently pregnant</div>}
+        {profile.disabilities && <div><dt className="inline font-semibold">Access needs: </dt><dd className="inline text-white/90">{profile.disabilities}</dd></div>}
+        {profile.nhia_number && <div><dt className="inline font-semibold">NHIA: </dt><dd className="inline text-white/90">{profile.nhia_number}{profile.hmo_name ? ` · ${profile.hmo_name}` : ""}</dd></div>}
+        {profile.emergency_contact?.name && <div><dt className="inline font-semibold">Next of kin: </dt><dd className="inline text-white/90">{profile.emergency_contact.name} ({profile.emergency_contact.relationship ?? "contact"}) {profile.emergency_contact.phone}</dd></div>}
+      </dl>
+      <p className="mt-3 text-[11px] text-white/70">Patient-provided · updated {formatDate(profile.updated_at)} · this view was logged</p>
+    </section>
+  );
+}
 
 type Perm = { id: string; reference: string; purpose: string; purpose_detail: string; basis: string; expires_at: string; date_from: string | null; date_to: string | null; categories: string[]; restricted_to_professional: boolean; specific_records: number };
 
@@ -28,10 +59,11 @@ export default async function ProviderPatient({ params }: { params: Promise<{ pa
   if (!current || !can("records:view_authorized")) redirect("/provider");
   const inst = current.institutionId;
   const meta = await requestMeta();
-  const { overview, records } = await withActor(actor.userId, async (tx) => {
+  const { overview, records, health } = await withActor(actor.userId, async (tx) => {
     const [{ o }] = await tx`select app.provider_patient_overview(${inst}, ${patientId}) as o`;
     const recs = o.allowed ? await tx`select * from app.provider_list_records(${inst}, ${patientId})` : [];
-    return { overview: o, records: recs };
+    const hp = o.allowed ? (await tx`select app.provider_health_profile(${inst}, ${patientId}) as h`)[0].h : null;
+    return { overview: o, records: recs, health: hp as EmergencyProfile | null };
   }, meta);
 
   if (!overview.allowed) {
@@ -61,6 +93,8 @@ export default async function ProviderPatient({ params }: { params: Promise<{ pa
           </div>
           <div className="flex flex-wrap gap-2">
             {can("records:submit") && <Button asChild variant="secondary" icon="upload_file"><Link href={`/provider/submit?patient=${patientId}`}>Add a record</Link></Button>}
+            {can("records:submit") && <ReferDialog patientId={patientId} patientName={p.full_name}
+              records={(records as unknown as RecordRowData[]).map((r) => ({ id: r.id, title: r.title, category_key: r.category_key, clinical_date: r.clinical_date }))} />}
           </div>
         </header>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -76,6 +110,7 @@ export default async function ProviderPatient({ params }: { params: Promise<{ pa
             )}
           </div>
           <aside className="space-y-4">
+            <EmergencyProfileCard profile={health} />
             {perms.map((x) => (
               <Card key={x.id}>
                 <CardHeader><div><CardTitle>Authorisation</CardTitle><p className="font-mono text-xs text-ink-3">{x.reference}</p></div>

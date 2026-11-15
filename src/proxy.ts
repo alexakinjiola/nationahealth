@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from "next/server";
  *     authorization decision — every page, action and route re-validates the
  *     session server-side, and the database enforces RLS.
  */
-const PROTECTED = /^\/(dashboard|records|timeline|access|activity|notifications|settings|support|onboarding|health-profile|immunisations|provider(?!\/register)|admin)(\/|$)/;
+const PROTECTED = /^\/(dashboard|records|timeline|access|activity|notifications|settings|support|onboarding|health-profile|immunisations|referrals|maternity|reminders|provider(?!\/register)|admin)(\/|$)/;
 
 export function proxy(req: NextRequest) {
   if (PROTECTED.test(req.nextUrl.pathname) && !req.cookies.get("continuum_session")) {

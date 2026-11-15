@@ -65,3 +65,36 @@ Same steps as A, but run `db/local/000_supabase_compat.sql` as a superuser first
 - [ ] CI green on the release commit (`.github/workflows/ci.yml`)
 - [ ] Load test repeated on production-like infrastructure (`scripts/load-test.mjs`)
 - [ ] `TRUSTED_PROXY_HOPS` set for the real proxy chain; `PASSWORD_BREACH_CHECK=hibp`
+
+## Background jobs (migration 020)
+
+| Job | Route | What it does |
+|---|---|---|
+| Expiry | `/api/cron/expire` | Expires permissions and requests, sends expiry warnings |
+| Reminders | `/api/cron/reminders` | Queues due medicine, appointment, antenatal and vaccination reminders, then sends them |
+| Delivery | `/api/cron/deliver` | Sends queued email/SMS (retries with back-off) |
+| All | `/api/cron/all` | All three, for a single frequent scheduler |
+
+All accept `GET` (what Vercel Cron sends) or `POST`, with `Authorization: Bearer $CRON_SECRET`.
+
+- **Immediately:** every successful server action sends waiting messages right after the response (`next/server` `after`), so sign-up emails and alerts don't wait for a schedule.
+- **Vercel Cron** (`vercel.json`): expiry and reminders once a day each. The Hobby plan only allows daily jobs, so these are the safety net.
+- **GitHub Actions** (`.github/workflows/scheduled-jobs.yml`): calls `/api/cron/all` every 15 minutes so medicine reminders arrive on time. Add repository secrets `CRON_SECRET` (same as Vercel) and `APP_URL` (or a variable). While Vercel Authentication protects the site, also add `VERCEL_BYPASS` (Vercel → Settings → Deployment Protection → Protection Bypass for Automation).
+
+## Email with an ordinary mailbox
+
+Any mailbox that offers SMTP works. For Gmail:
+
+1. Turn on 2-Step Verification for the Google account.
+2. Create an app password at https://myaccount.google.com/apppasswords.
+3. In Vercel set `MAIL_DRIVER=smtp`, `SMTP_URL=smtps://you%40gmail.com:APP_PASSWORD@smtp.gmail.com:465` (write `@` in the address as `%40`, remove the spaces from the app password) and `MAIL_FROM=Continuum <you@gmail.com>`. Mark `SMTP_URL` as Sensitive.
+4. Set `ENABLE_DEV_MAILBOX=false` and redeploy.
+
+Gmail allows roughly 500 messages a day and may file mail from an app as spam. That's fine for a pilot; use a transactional provider (Resend, Postmark, Zoho ZeptoMail, Amazon SES) with your own domain before a wider launch. Outlook: `smtp://you%40outlook.com:PASSWORD@smtp-mail.outlook.com:587`. Zoho: `smtps://you%40zoho.com:APP_PASSWORD@smtp.zoho.com:465`.
+
+## Phone access (USSD and SMS) via Africa's Talking
+
+1. Create an Africa's Talking account, then a USSD service code and an SMS sender ID (start in the sandbox).
+2. In Vercel set `PHONE_WEBHOOK_KEY` (a random string of 16+ characters), `USSD_SERVICE_CODE` (e.g. `*384*1234#`), `SMS_DRIVER=africastalking`, `SMS_API_KEY`, `SMS_USERNAME` and `SMS_SENDER_ID`.
+3. In Africa's Talking set the USSD callback to `https://<site>/api/ussd?key=<PHONE_WEBHOOK_KEY>` and the incoming-SMS callback to `https://<site>/api/sms/inbound?key=<PHONE_WEBHOOK_KEY>`.
+4. Patients turn it on under Profile & settings → Phone access by choosing a 4–6 digit PIN. Five wrong PINs lock phone access for 30 minutes. Every use is audited.

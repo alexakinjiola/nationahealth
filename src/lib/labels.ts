@@ -156,3 +156,9 @@ export const DENIAL_REASON: Record<string, string> = {
   account_inactive: "Account inactive", rate_limited: "Too many searches", record_not_found: "Record not found",
   emergency_limit_reached: "Emergency access limit reached", file_not_available: "File not available", not_found: "Not found",
 };
+
+export const REFERRAL_STATUS: Record<string, { label: string; tone: Tone }> = {
+  awaiting_patient: { label: "Waiting for patient", tone: "warning" }, declined_by_patient: { label: "Patient declined", tone: "danger" },
+  sent: { label: "New", tone: "info" }, accepted: { label: "Accepted", tone: "success" }, declined: { label: "Declined", tone: "danger" },
+  completed: { label: "Completed", tone: "neutral" }, cancelled: { label: "Cancelled", tone: "neutral" }, expired: { label: "Expired", tone: "neutral" },
+};
