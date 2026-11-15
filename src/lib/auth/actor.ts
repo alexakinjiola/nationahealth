@@ -9,6 +9,7 @@ export interface Affiliation {
   id: string;
   institutionId: string;
   institutionName: string;
+  institutionCode: string;
   institutionStatus: string;
   institutionType: string;
   roleKey: string;
@@ -53,7 +54,7 @@ async function loadActor(session: SessionRow): Promise<Actor | null> {
     const [pro] = await tx`select id, full_name, profession, verification_status from healthcare_professionals where user_id = ${u.id}`;
     const affiliations = pro
       ? await tx`
-          select a.id, a.institution_id, i.name, i.status as inst_status, i.institution_type, r.key, r.name as role_name,
+          select a.id, a.institution_id, i.name, i.institution_code, i.status as inst_status, i.institution_type, r.key, r.name as role_name,
                  r.capabilities, a.status
           from professional_affiliations a
           join healthcare_institutions i on i.id = a.institution_id
@@ -85,7 +86,7 @@ async function loadActor(session: SessionRow): Promise<Actor | null> {
         ? { id: pro.id, fullName: pro.full_name, profession: pro.profession, verificationStatus: pro.verification_status }
         : null,
       affiliations: affiliations.map((a) => ({
-        id: a.id, institutionId: a.institution_id, institutionName: a.name, institutionStatus: a.inst_status,
+        id: a.id, institutionId: a.institution_id, institutionName: a.name, institutionCode: a.institution_code, institutionStatus: a.inst_status,
         institutionType: a.institution_type, roleKey: a.key, roleName: a.role_name, capabilities: a.capabilities,
         status: a.status,
       })),

@@ -1,3 +1,4 @@
+import { formatInstitutionCode } from "@/lib/validation/common";
 import { AppShell } from "@/components/shell/app-shell";
 import { UserMenu } from "@/components/shell/user-menu";
 import { NotificationBell } from "@/components/shell/notification-bell";
@@ -32,6 +33,7 @@ export default async function ProviderLayout({ children }: { children: React.Rea
       {affiliations.length > 1
         ? <InstitutionSwitcher current={current.institutionId} options={affiliations.map((a) => ({ id: a.institutionId, name: a.institutionName }))} />
         : <p className="mt-1 text-sm font-semibold text-white">{current.institutionName}</p>}
+      <p className="mt-1 font-mono text-xs tracking-[0.04em] text-navy-200"><span className="sr-only">Institution ID </span>{formatInstitutionCode(current.institutionCode)}</p>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {status && <Badge tone={status.tone} className="!h-5 !text-[11px]">{status.label}</Badge>}
         <span className="text-xs text-navy-200">{current.roleName}</span>

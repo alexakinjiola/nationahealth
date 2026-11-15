@@ -1,3 +1,4 @@
+import { formatInstitutionCode } from "@/lib/validation/common";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -33,7 +34,7 @@ export default async function InstitutionPage() {
 
   return (
     <div className="animate-fade-in">
-      <PageHeader eyebrow="Institution settings" title={i.name} actions={<Badge tone={s.tone}>{s.label}</Badge>} />
+      <PageHeader eyebrow="Institution settings" title={i.name} description={<>Institution ID <span className="font-mono text-ink-2">{formatInstitutionCode(i.institution_code)}</span> — share this with patients and other institutions so they can confirm it's you.</>} actions={<Badge tone={s.tone}>{s.label}</Badge>} />
       {i.status_reason && <Callout tone={i.status === "approved" ? "info" : "danger"} className="mb-6" title="Message from the platform team">{i.status_reason}</Callout>}
       {editable && (
         <Callout tone="info" className="mb-6" title={hasLicence ? "Ready to submit?" : "Upload your operating licence to continue"}

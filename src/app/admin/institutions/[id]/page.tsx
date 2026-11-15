@@ -1,3 +1,4 @@
+import { formatInstitutionCode } from "@/lib/validation/common";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -58,6 +59,7 @@ export default async function InstitutionReview({ params }: { params: Promise<{ 
         <div className="space-y-6">
           <Card><CardHeader><CardTitle>Registration & licensing</CardTitle></CardHeader><CardBody>
             <DescriptionList items={[
+              { label: "Institution ID", value: <span className="font-mono">{formatInstitutionCode(i.institution_code)}</span> },
               { label: "Registration number", value: <span className="font-mono">{i.registration_number}</span> },
               { label: "Operating licence", value: <span className="font-mono">{i.license_number}</span> },
               { label: "Licensing authority", value: i.license_authority },
