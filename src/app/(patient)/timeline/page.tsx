@@ -66,7 +66,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
         <div className="mt-8 space-y-10">
           {[...byYear.entries()].map(([year, items]) => (
             <section key={year} aria-labelledby={`y-${year}`}>
-              <h2 id={`y-${year}`} className="sticky top-16 z-10 -mx-1 mb-4 bg-canvas/95 px-1 py-1 font-display text-2xl font-medium text-ink backdrop-blur">{year}</h2>
+              <h2 id={`y-${year}`} className="sticky top-16 z-10 -mx-1 mb-4 bg-canvas/95 px-1 py-1 text-2xl font-bold text-ink backdrop-blur">{year}</h2>
               <ol className="relative space-y-3 border-l-2 border-line pl-6 sm:ml-[92px] sm:pl-8">
                 {items.map((r) => (
                   <li key={r.id} className="relative">

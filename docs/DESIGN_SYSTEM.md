@@ -1,31 +1,35 @@
 # Design system
 
-**Intent:** a well-made printed record, not a software template. Warm paper canvas, forest-green brand, green-black ink and a single clay accent for things that need the patient's attention. Editorial serif headlines, hairline rules instead of boxes, small radii, almost no shadow, no gradients or glass. The landing page illustrates with real-looking clinical paper (a lab report, a consent slip, a verification stamp), drawn in code — never stock imagery.
+**Intent:** bright, airy and human. Dark blue is the primary colour and dark green the secondary. Real photography of Nigerian and African clinicians, scientists and patients does the emotional work. The interface around it is calm: white cards with soft blue-tinted shadows on a faint blue canvas, generous rounded corners, pill-shaped buttons and tabs, and icons set in tinted circles. Headlines are bold sans-serif with one or two words in an italic serif accent (`.accent-word`).
 
 ## Typography
 
 | Role | Face | Use |
 |---|---|---|
-| Display | Newsreader (variable serif) | Every page title, section headings, key numbers. Light weights and italics for emphasis. |
-| UI | Schibsted Grotesk (variable) | Everything else. A newsroom grotesk with more character than a default system face, still very legible at small sizes. |
-| Data | IBM Plex Mono | Health IDs, references (`REQ-…`, `PRM-…`), dates in lists, eyebrow labels |
+| UI and headings | Plus Jakarta Sans (variable) | Everything, from 800-weight hero headlines to 13px captions. |
+| Accent | Newsreader italic (variable serif) | One or two emphasised words in a headline, in dark green. Never body text. |
+| Data | IBM Plex Mono | Health IDs, references (`REQ-…`, `PRM-…`), licence numbers |
 
-All three are self-hosted through `@fontsource`, so the browser makes no third-party font requests. The scale runs 11 / 12 / 14 / 16 / 18 / 22 / 28 / 36 / 48 px (`--text-*` in `globals.css`); display headlines go larger on the landing page.
+All three are self-hosted through `@fontsource`, so the browser makes no third-party font requests.
 
 ## Colour tokens and measured contrast (WCAG 2.2 AA)
 
 | Pair | Ratio |
 |---|---|
-| ink `#16201C` on canvas `#F4F1EA` | 14.8:1 |
-| ink-2 `#39443F` on surface `#FFFEFB` | 10.0:1 |
-| ink-3 `#58625D` on canvas / surface | 5.6 / 6.3:1 |
-| brand-600 `#0E6B52` on surface / canvas | 6.4 / 5.7:1 |
-| white on brand-600 / on ink | 6.5 / 16.7:1 |
-| clay-600 `#A8461F` on surface; clay-700 on clay-50 | 5.8 / 6.9:1 |
-| navy-200 / navy-300 on navy-900 (provider/admin sidebar) | 11.7 / 6.8:1 |
-| brand-200 on brand-800 (Health ID card) | 6.1:1 |
+| ink `#0E1B34` on canvas `#F5F8FD` | 16.1:1 |
+| ink-3 `#5A6479` on canvas / white | 5.6 / 5.9:1 |
+| brand-600 `#0B4CB4` (primary, dark blue) on white / brand-50 | 7.8 / 7.0:1 |
+| accent-600 `#146F3B` (secondary, dark green) on white | 6.2:1 |
+| accent-700 on accent-50 | 7.5:1 |
+| success / warning / danger / info text on their tints | 5.6 / 5.9 / 6.5 / 6.8:1 |
+| navy-200 / navy-300 on navy-900 (provider/admin sidebar, deep blue) | 11.1 / 7.7:1 |
+| placeholder `#6A7388` on white | 4.75:1 |
 
-The `navy-*` tokens keep their names for compatibility but are now a deep green-black, so the professional workspaces share the patient app's palette. Axe runs on 39 screens in the e2e suite and fails the build on any contrast regression.
+Shape: radii are 6 / 10 / 12 / 18 / 24 / 32 px (`--radius-xs` to `--radius-2xl`). Buttons and tabs are fully rounded. Cards use `--shadow-card`. Axe runs on 39 screens in the e2e suite and fails the build on any contrast regression.
+
+## Photography
+
+Photos live in `public/images` as WebP and are served through `next/image` with blur placeholders. All are from Unsplash under the free Unsplash License; sources are listed in `public/images/CREDITS.md`. Rules: real people, never AI-generated; show Nigerian and African patients and clinicians; always a meaningful `alt` unless decorative; text placed on photos always sits on a dark gradient scrim.
 
 Status is never shown by colour alone. Every badge has text, and provenance badges also carry an icon.
 
@@ -39,7 +43,7 @@ Status is never shown by colour alone. Every badge has text, and provenance badg
 
 ## Components (`src/components`)
 
-- `ui/`: Button (variants: primary, ink, secondary, ghost, danger, danger-outline, navy, link; with a loading state), Field/Input/Textarea/Select (label, hint and error wired automatically through context), Checkbox / CheckboxCard, RadioCards, Dialog, ConfirmDialog (reason and step-up built in), DropdownMenu, Badge, Callout, Card, Stat, Table, TabsNav (URL-driven), FilterBar (no-JS GET form), Pagination, EmptyState, Skeleton / PageSkeleton, Toaster (polite live region), PasswordInput, ActionButton, Icon.
+- `ui/`: Button (variants: primary, ink, accent, secondary, ghost, danger, danger-outline, navy, link; with a loading state), Field/Input/Textarea/Select (label, hint and error wired automatically through context), Checkbox / CheckboxCard, RadioCards, Dialog, ConfirmDialog (reason and step-up built in), DropdownMenu, Badge, Callout, Card, Stat, Table, TabsNav (URL-driven), FilterBar (no-JS GET form), Pagination, EmptyState, Skeleton / PageSkeleton, Toaster (polite live region), PasswordInput, ActionButton, Icon.
 - `shell/`: one `AppShell` with three moods (patient light, provider/admin navy), MobileDrawer, BottomNav (patient, mobile), UserMenu, NotificationBell, SkipLink, SyntheticBanner.
 - `domain/`: RecordRow, ProvenanceBadge, CategoryIcon, HealthIdChip, ActivityItem, NotificationList, AccessGuard, FileDrop and upload with progress, StructuredData, Charts (with screen-reader figcaptions), SecuritySettings, IdentityForm.
 

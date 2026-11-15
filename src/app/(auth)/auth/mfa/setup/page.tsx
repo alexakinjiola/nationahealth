@@ -15,7 +15,7 @@ export default async function MfaSetupPage() {
   return (
     <div className="animate-slide-up">
       <p className="eyebrow">Account security</p>
-      <h1 className="mt-2 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Set up two-step verification</h1>
+      <h1 className="mt-2 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">Set up two-step verification</h1>
       <p className="mt-2 text-[15px] text-ink-3">Each time you sign in you'll enter a code from your phone as well as your password.</p>
       {required && (
         <Callout tone="info" className="mt-6">

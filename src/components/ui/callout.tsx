@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 import { Icon, type IconName } from "./icon";
 import type { Tone } from "./badge";
 
-const STYLES: Record<Exclude<Tone, "sand" | "brand">, { box: string; icon: IconName }> = {
+const STYLES: Record<Exclude<Tone, "sand" | "brand" | "accent">, { box: string; icon: IconName }> = {
   neutral: { box: "border-line bg-surface text-ink-2", icon: "info" },
   info: { box: "border-info-line bg-info-bg text-info-fg", icon: "info" },
   success: { box: "border-success-line bg-success-bg text-success-fg", icon: "check_circle" },

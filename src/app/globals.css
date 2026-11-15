@@ -2,81 +2,87 @@
 
 /* ──────────────────────────────────────────────────────────────────────────
    Continuum design tokens
-   Printed-paper palette: forest green brand, green-black ink, clay accent.
+   Light, airy palette: dark blue primary, dark green secondary, white cards on a faint blue canvas.
    Every text/background pair below is ≥ 4.5:1 (WCAG 2.2 AA); see
    docs/DESIGN_SYSTEM.md for the measured ratios.
    ────────────────────────────────────────────────────────────────────────── */
 @theme {
-  --font-sans: "Schibsted Grotesk Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --font-display: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
-  /* Paper and ink — a warm, printed feel rather than screen white. */
-  --color-canvas: #f4f1ea;
-  --color-surface: #fffefb;
-  --color-sunken: #ebe6db;
-  --color-line: #e0dacd;
-  --color-line-strong: #c9c1b0;
+  /* Airy, light surfaces with a faint blue cast. */
+  --color-canvas: #f5f8fd;
+  --color-surface: #ffffff;
+  --color-sunken: #edf2f9;
+  --color-line: #e2e8f2;
+  --color-line-strong: #c8d2e1;
 
-  --color-ink: #16201c;
-  --color-ink-2: #39443f;
-  --color-ink-3: #58625d;
-  --color-placeholder: #6a736e;
+  --color-ink: #0e1b34;
+  --color-ink-2: #3a4660;
+  --color-ink-3: #5a6479;
+  --color-placeholder: #6a7388;
 
-  /* Forest green — calm, clinical, unmistakably Nigerian. */
-  --color-brand-50: #e9f2ee;
-  --color-brand-100: #cfe4da;
-  --color-brand-200: #a2cbb9;
-  --color-brand-500: #178a6a;
-  --color-brand-600: #0e6b52;
-  --color-brand-700: #0a5642;
-  --color-brand-800: #084537;
-  --color-brand-900: #06302a;
+  /* Primary — dark blue (deliberately brighter than navy). */
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #dce8ff;
+  --color-brand-200: #b8cff8;
+  --color-brand-300: #8aaeee;
+  --color-brand-500: #1d5fd1;
+  --color-brand-600: #0b4cb4;
+  --color-brand-700: #0a3f96;
+  --color-brand-800: #0b347a;
+  --color-brand-900: #0b2b62;
 
-  /* Clay — a warm human accent used sparingly for emphasis. */
-  --color-clay-50: #f9ede5;
-  --color-clay-100: #f1d6c6;
-  --color-clay-500: #c25a2e;
-  --color-clay-600: #a8461f;
-  --color-clay-700: #8a3816;
+  /* Secondary — dark green. */
+  --color-accent-50: #ebf7f0;
+  --color-accent-100: #d2eedd;
+  --color-accent-200: #a6dbbb;
+  --color-accent-500: #1d8a4b;
+  --color-accent-600: #146f3b;
+  --color-accent-700: #0f5b30;
+  --color-accent-800: #0c4927;
 
-  /* Deep green-black for the professional workspaces (provider, admin). */
-  --color-navy-950: #09120f;
-  --color-navy-900: #0e1a16;
-  --color-navy-800: #16201c;
-  --color-navy-700: #213029;
-  --color-navy-600: #32443b;
-  --color-navy-300: #94a49c;
-  --color-navy-200: #c9d4ce;
+  /* Deep blue for the professional workspaces (provider, admin). Token names kept for compatibility. */
+  --color-navy-950: #061738;
+  --color-navy-900: #0a2150;
+  --color-navy-800: #0e2a62;
+  --color-navy-700: #163876;
+  --color-navy-600: #234789;
+  --color-navy-300: #a3b7dc;
+  --color-navy-200: #cfdaef;
 
-  --color-sand-50: #f7f1e4;
-  --color-sand-100: #efe4cd;
-  --color-sand-700: #6b5a34;
+  --color-sand-50: #fff8ec;
+  --color-sand-100: #fdecc8;
+  --color-sand-700: #7a5414;
 
-  --color-success-bg: #e5f1ea;
-  --color-success-fg: #1a6240;
-  --color-success-line: #b5d7c4;
-  --color-warning-bg: #fbf0dc;
-  --color-warning-fg: #82500a;
-  --color-warning-line: #e9cd97;
-  --color-danger-bg: #f9e6e2;
-  --color-danger-fg: #a1291d;
-  --color-danger-line: #ebb7ae;
+  --color-success-bg: #e8f6ee;
+  --color-success-fg: #146f3b;
+  --color-success-line: #b4dec5;
+  --color-warning-bg: #fff4e0;
+  --color-warning-fg: #8a520a;
+  --color-warning-line: #f3d199;
+  --color-danger-bg: #fdecea;
+  --color-danger-fg: #a3241b;
+  --color-danger-line: #f2bcb6;
   --color-danger-600: #b42318;
-  --color-info-bg: #e7eef5;
-  --color-info-fg: #1e4c7e;
-  --color-info-line: #bccbdf;
+  --color-info-bg: #eaf1ff;
+  --color-info-fg: #0b4cb4;
+  --color-info-line: #bcd0f5;
 
-  --radius-xs: 3px;
-  --radius-sm: 5px;
-  --radius-md: 7px;
-  --radius-lg: 10px;
+  /* Soft, generous radii. */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
 
-  --shadow-xs: 0 1px 0 rgb(22 32 28 / 0.04);
-  --shadow-sm: 0 1px 2px rgb(22 32 28 / 0.06);
-  --shadow-md: 0 6px 16px -6px rgb(22 32 28 / 0.12), 0 2px 4px -2px rgb(22 32 28 / 0.06);
-  --shadow-lg: 0 28px 60px -24px rgb(22 32 28 / 0.32), 0 8px 18px -10px rgb(22 32 28 / 0.12);
-  --shadow-paper: 0 1px 0 rgb(22 32 28 / 0.05), 0 18px 40px -22px rgb(22 32 28 / 0.35);
+  --shadow-xs: 0 1px 2px rgb(14 27 52 / 0.05);
+  --shadow-sm: 0 2px 6px -1px rgb(14 27 52 / 0.06);
+  --shadow-md: 0 12px 28px -12px rgb(11 52 122 / 0.18), 0 2px 6px -2px rgb(14 27 52 / 0.06);
+  --shadow-lg: 0 30px 60px -24px rgb(11 52 122 / 0.30), 0 8px 18px -8px rgb(14 27 52 / 0.10);
+  --shadow-card: 0 1px 2px rgb(14 27 52 / 0.04), 0 10px 30px -18px rgb(11 52 122 / 0.22);
 
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
@@ -98,7 +104,7 @@
   --text-4xl--line-height: 3.375rem;
 
   --animate-fade-in: fade-in 220ms ease-out;
-  --animate-slide-up: slide-up 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slide-up 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
@@ -112,7 +118,7 @@
   }
   body {
     @apply bg-canvas text-ink font-sans antialiased;
-    font-feature-settings: "kern", "liga";
+    font-feature-settings: "kern", "liga", "ss01";
   }
   ::selection { background: var(--color-brand-100); color: var(--color-ink); }
 
@@ -133,9 +139,10 @@
 @layer components {
   .font-display { font-optical-sizing: auto; letter-spacing: -0.012em; }
   .tabular { font-variant-numeric: tabular-nums; }
-  .eyebrow { @apply font-mono text-2xs font-medium uppercase tracking-[0.14em] text-ink-3; }
-  /* Subtle paper texture: two faint dot lattices, no images to download. */
-  .paper { background-color: var(--color-surface); background-image: radial-gradient(rgb(22 32 28 / 0.035) 1px, transparent 1px); background-size: 14px 14px; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.12em] text-brand-600; }
+  /* Italic serif accent for one or two words in a headline. */
+  .accent-word { @apply font-display font-normal italic tracking-[-0.01em] text-accent-600; }
+  .card { @apply rounded-lg border border-line/80 bg-surface shadow-card; }
   .link { @apply font-medium text-brand-700 underline decoration-brand-200 underline-offset-[3px] transition-colors hover:decoration-brand-600; }
 }
 

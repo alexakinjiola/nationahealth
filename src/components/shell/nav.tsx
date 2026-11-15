@@ -23,19 +23,18 @@ export function SideNav({ items, dark, onNavigate }: { items: NavItem[]; dark?: 
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "group relative flex h-10 items-center gap-3 rounded-md px-3 text-[14px] font-medium transition-colors",
-                "before:absolute before:-left-4 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:transition-colors",
+                "group relative flex h-11 items-center gap-3 rounded-md px-3.5 text-[14px] font-semibold transition-colors",
                 dark
-                  ? active ? "bg-white/[0.07] text-white before:bg-brand-200" : "text-navy-200 hover:bg-white/[0.04] hover:text-white"
-                  : active ? "bg-sunken/80 text-ink before:bg-brand-600" : "text-ink-2 hover:bg-sunken/60 hover:text-ink",
+                  ? active ? "bg-white/[0.10] text-white" : "text-navy-200 hover:bg-white/[0.05] hover:text-white"
+                  : active ? "bg-brand-600 text-white shadow-[0_8px_18px_-8px_rgb(11_76_180_/_0.6)]" : "text-ink-2 hover:bg-brand-50 hover:text-brand-700",
               )}
             >
               <Icon name={item.icon} size={20} filled={active}
-                className={cn(dark ? (active ? "text-brand-200" : "text-navy-300 group-hover:text-navy-200") : active ? "text-brand-600" : "text-ink-3")} />
+                className={cn(dark ? (active ? "text-brand-200" : "text-navy-300 group-hover:text-navy-200") : active ? "text-white" : "text-ink-3 group-hover:text-brand-600")} />
               <span className="flex-1">{item.label}</span>
               {!!item.badge && (
                 <span className={cn("min-w-5 rounded-full px-1.5 text-center text-xs font-semibold leading-5 tabular",
-                  dark ? "bg-brand-500 text-white" : "bg-clay-50 text-clay-700 ring-1 ring-inset ring-clay-100")}>
+                  dark ? "bg-accent-500 text-white" : active ? "bg-white/20 text-white" : "bg-accent-50 text-accent-700 ring-1 ring-inset ring-accent-200")}>
                   {item.badge}<span className="sr-only"> pending</span>
                 </span>
               )}
@@ -57,7 +56,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
           return (
             <li key={item.href}>
               <Link href={item.href} aria-current={active ? "page" : undefined}
-                className={cn("relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium", active ? "text-brand-700" : "text-ink-3")}>
+                className={cn("relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium", active ? "text-brand-600" : "text-ink-3")}>
                 <Icon name={item.icon} size={22} filled={active} />
                 {item.label}
                 {!!item.badge && <span className="absolute right-[calc(50%-18px)] top-2.5 size-2 rounded-full bg-warning-fg" aria-label={`${item.badge} pending`} />}

@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function PrivacyPage() {
   const docs = await withAnon((tx) => tx`select distinct on (key) key, title, body, version from policy_documents order by key, version desc`);
   return (
-    <PublicShell>
+    <PublicShell current="/privacy">
       <article className="mx-auto max-w-2xl px-5 py-12 sm:px-8">
-        <h1 className="font-display text-[2.25rem] font-medium text-ink">Privacy & data protection</h1>
+        <h1 className="text-[2rem] font-bold tracking-[-0.025em] text-ink">Privacy & data protection</h1>
         <Callout tone="warning" className="mt-6">Draft for pilot preparation. These notices must be reviewed by qualified Nigerian privacy and healthcare counsel (NDPA 2023, NDPC guidance, National Health Act) before production use.</Callout>
         {docs.map((d) => (
           <section key={d.key} className="mt-10"><h2 className="text-xl font-semibold text-ink">{d.title}</h2>

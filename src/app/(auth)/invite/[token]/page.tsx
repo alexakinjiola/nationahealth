@@ -17,14 +17,14 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     where i.token_hash = ${sha256Hex(token)}`) : [];
   const actor = await getActor();
   if (!inv || inv.status !== "pending" || !inv.live) {
-    return <div><h1 className="font-display text-[2rem] font-medium text-ink">Invitation unavailable</h1>
+    return <div><h1 className="text-[1.75rem] font-bold tracking-[-0.02em] text-ink">Invitation unavailable</h1>
       <p className="mt-2 text-ink-3">This invitation has expired or was already used. Ask your institution administrator to send a new one.</p></div>;
   }
   const next = encodeURIComponent(`/invite/${token}`);
   return (
     <div className="animate-slide-up">
       <p className="eyebrow">Staff invitation</p>
-      <h1 className="mt-2 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Join {inv.institution}</h1>
+      <h1 className="mt-2 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink">Join {inv.institution}</h1>
       <p className="mt-2 text-[15px] text-ink-3">You've been invited as <strong className="text-ink">{inv.role}</strong>.</p>
       <div className="mt-8">
         {!actor ? (
