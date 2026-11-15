@@ -1,3 +1,4 @@
+import { formatInstitutionCode } from "@/lib/validation/common";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -85,6 +86,7 @@ export default async function RequestPage({ params }: { params: Promise<{ id: st
                 <p className="text-xs text-ink-3">Institution</p>
                 <p className="mt-0.5 font-semibold text-ink">{r.institution.name}</p>
                 <p className="text-sm text-ink-3">{INSTITUTION_TYPE[r.institution.type]}{r.institution.city ? ` · ${r.institution.city}, ${r.institution.state}` : ""}</p>
+                {r.institution.code && <p className="mt-1 text-sm text-ink-3">Institution ID <span className="font-mono text-ink-2">{formatInstitutionCode(r.institution.code)}</span></p>}
                 <Badge tone={inst?.tone} icon={r.institution.status === "approved" ? "verified" : "warning"} className="mt-2">{inst?.label} on the platform</Badge>
               </div>
               <div className="border-t border-line pt-5">

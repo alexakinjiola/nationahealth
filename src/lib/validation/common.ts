@@ -79,3 +79,5 @@ export const healthIdSchema = z
   .refine(healthIdIsValid, "That Health ID doesn't look right. It starts with NG followed by 10 digits.");
 
 export const formatHealthId = (id: string) => `${id.slice(0, 2)} ${id.slice(2, 6)} ${id.slice(6, 10)} ${id.slice(10)}`;
+/** "HOS482193752" → "HOS 4821 9375 2". Issued by the database on insert (migration 018). */
+export const formatInstitutionCode = (id: string) => `${id.slice(0, 3)} ${id.slice(3, 7)} ${id.slice(7, 11)} ${id.slice(11)}`;

@@ -53,9 +53,14 @@ export async function createPatient(
     returning id`;
   await sql`insert into patient_profiles(patient_id, full_name, date_of_birth, sex, phone)
             values (${p.id}, ${o.fullName ?? "Ada Synthetic"}, ${o.dob ?? "1990-04-12"}, ${o.sex ?? "female"}, ${o.phone ?? null})`;
+  // The database issues a Health ID on insert; a fixed one replaces it for tests that need it.
+  if (o.healthId) {
+    await sql`delete from health_identifiers where patient_id = ${p.id} and identifier_type = 'platform_hid'`;
+    await sql`insert into health_identifiers(patient_id, identifier_type, value, is_primary)
+              values (${p.id}, 'platform_hid', ${o.healthId}, true)`;
+  }
   const [h] = await sql<{ value: string }[]>`
-    insert into health_identifiers(patient_id, identifier_type, value, is_primary)
-    values (${p.id}, 'platform_hid', ${o.healthId ?? sql`app.generate_health_id()`}, true) returning value`;
+    select value from health_identifiers where patient_id = ${p.id} and identifier_type = 'platform_hid'`;
   return { patientId: p.id, userId: userId as string | null, healthId: h.value };
 }
 

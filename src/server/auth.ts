@@ -63,8 +63,7 @@ export async function registerPatient(
     const [patient] = await tx<{ id: string }[]>`insert into patients(user_id) values (${user.id}) returning id`;
     await tx`insert into patient_profiles(patient_id, full_name, date_of_birth, sex, phone)
              values (${patient.id}, ${input.fullName}, ${input.dateOfBirth}, ${input.sex}, ${input.phone})`;
-    await tx`insert into health_identifiers(patient_id, identifier_type, value, is_primary)
-             values (${patient.id}, 'platform_hid', app.generate_health_id(), true)`;
+    // The Health ID is issued by the database when this transaction commits (migration 018).
 
     // Possible duplicate person: flag for reconciliation, never auto-merge.
     const [dupe] = await tx`

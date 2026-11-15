@@ -72,3 +72,16 @@ RLS is **enabled and forced** on every table. Default deny.
 | Auth tables, outbox | Nobody except `service_role` |
 
 Writes by `authenticated` are limited to `notifications.read_at`, notification preferences, and patient contact columns. Everything else goes through `app.*` functions.
+
+## Platform identifiers (migration 018)
+
+Every patient and every institution carries a unique, permanent platform ID that the database issues itself, so no code path can create one without it.
+
+| Who | Format | Example | Issued |
+|---|---|---|---|
+| Patient (Health ID) | `NG` + 9 digits + Luhn check digit | `NG 4471 0286 15` | When the patient row's transaction commits (deferred constraint trigger), if the application hasn't already issued one |
+| Institution (Institution ID) | Type prefix + 8 digits + Luhn check digit | `HOS 4821 9375 2` | On insert, by a `before insert` trigger. Any value the caller supplies is ignored. |
+
+Institution prefixes: `HOS` hospital, `CLN` clinic, `LAB` laboratory, `DXC` diagnostic centre, `PHC` primary health centre, `PHA` pharmacy.
+
+Both are unique by constraint, checked for format and check digit by constraint, and cannot be changed once issued (triggers raise `P0001`). The prefix reflects the type at registration; correcting the type later keeps the original ID. Tests: `tests/identifiers.test.ts`.
