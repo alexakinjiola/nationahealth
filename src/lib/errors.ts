@@ -14,7 +14,7 @@ export class AppError extends Error {
 }
 
 const SQLSTATE_TO_STATUS: Record<string, AppError["status"]> = {
-  NP400: 400, NP403: 403, NP404: 404, NP409: 409,
+  NP400: 400, NP401: 401, NP403: 403, NP404: 404, NP409: 409,
   "23505": 409, // unique_violation
   "23514": 400, // check_violation
   "22P02": 400, // invalid_text_representation (bad uuid/enum)

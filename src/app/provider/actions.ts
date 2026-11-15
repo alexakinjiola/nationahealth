@@ -140,7 +140,8 @@ export async function submitInstitutionAction(institutionId: string) {
 
 const inviteSchema = z.object({
   fullName: nameSchema, email: emailSchema,
-  roleKey: z.enum(["clinician", "lab_scientist", "records_officer", "institution_admin"], { message: "Choose a role." }),
+  // System role keys or a custom role key ("custom_<hex>") belonging to this institution; checked in SQL.
+  roleKey: z.string().regex(/^[a-z_0-9]{3,64}$/, { message: "Choose a role." }),
 });
 export async function inviteStaffAction(input: unknown) {
   return handle("invite_staff", async () => {
@@ -197,4 +198,35 @@ export async function providerTicketAction(input: unknown) {
     const [r] = await withActor(actor.userId, (tx) => tx`select app.create_support_ticket(${v.category}, ${v.subject}, ${v.description}, ${ctx.current?.institutionId ?? null}, null) as ref`);
     return { reference: r.ref as string };
   }, "Request sent to the platform team.");
+}
+
+// ── Institution roles ─────────────────────────────────────────────────────────
+const instRoleSchema = z.object({
+  id: z.string().uuid().nullable().optional(),
+  name: z.string().trim().min(3, "Give the role a name of at least 3 characters.").max(80),
+  description: z.string().trim().max(300).optional().default(""),
+  capabilities: z.array(z.string().regex(/^[a-z_]+:[a-z_]+$/)).min(1, "Choose at least one permission."),
+});
+
+export async function saveInstitutionRoleAction(input: unknown) {
+  return handle("institution_role_save", async () => {
+    const v = parse(instRoleSchema, input);
+    const { actor, inst, meta } = await current();
+    await withActor(actor.userId, (tx) => tx`select app.institution_upsert_role(${inst}, ${v.id ?? null}, ${v.name}, ${v.description}, ${v.capabilities})`, meta);
+  }, "Role saved.");
+}
+
+export async function deleteInstitutionRoleAction(roleId: string) {
+  return handle("institution_role_delete", async () => {
+    const { actor, inst, meta } = await current();
+    await withActor(actor.userId, (tx) => tx`select app.institution_delete_role(${inst}, ${uuid.parse(roleId)})`, meta);
+  }, "Role deleted.");
+}
+
+export async function setStaffRoleAction(affiliationId: string, v: { roleIds: string[] }) {
+  return handle("staff_role", async () => {
+    const roleId = uuid.parse(v.roleIds?.[0]);
+    const { actor, meta } = await current();
+    await withActor(actor.userId, (tx) => tx`select app.institution_set_staff_role(${uuid.parse(affiliationId)}, ${roleId})`, meta);
+  }, "Role changed. They've been notified.");
 }

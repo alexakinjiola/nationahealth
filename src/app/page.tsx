@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Image, { type StaticImageData } from "next/image";
 import { PublicShell } from "@/components/shell/public-shell";
+import { withService } from "@/lib/db";
+import { CountUp, Reveal } from "@/components/ui/motion";
+import { ConsentDemo } from "@/components/marketing/consent-demo";
 import { Button } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import heroDoctor from "../../public/images/hero-doctor.webp";
@@ -46,17 +49,26 @@ const STEPS: { icon: IconName; title: string; body: string }[] = [
   { icon: "task_alt", title: "Share on your terms", body: "When a new doctor asks, you choose what they see and for how long — or say no." },
 ];
 
+const NIGERIA: { icon: IconName; title: string; body: string; tone: string }[] = [
+  { icon: "emergency", title: "Emergency health card", body: "Blood group, genotype, allergies and next of kin on a card with a QR code that works offline in any emergency room.", tone: "bg-danger-bg text-danger-fg" },
+  { icon: "genetics", title: "Genotype on record", body: "Sickle cell status is the first thing a doctor sees, which changes how pain, fever and surgery are managed.", tone: "bg-warning-bg text-warning-fg" },
+  { icon: "vaccines", title: "Immunisation tracker", body: "Nigeria's routine schedule for every child you care for, with doses due and overdue at a glance.", tone: "bg-accent-50 text-accent-600" },
+  { icon: "travel_explore", title: "Verified facility directory", body: "Find licensed hospitals, labs and clinics by state, and confirm their Institution ID before you share.", tone: "bg-brand-50 text-brand-600" },
+  { icon: "monitoring", title: "Disease surveillance", body: "De-identified trends in malaria, Lassa fever, TB, hypertension and more help plan responses by state.", tone: "bg-[#ede9fe] text-[#5b21b6]" },
+  { icon: "id_card", title: "NHIA-ready", body: "Keep your NHIA number and HMO with your record, so registration at any facility is faster.", tone: "bg-[#e0f2fe] text-[#075985]" },
+];
+
 const SERVICES: { icon: IconName; title: string; body: string; img: StaticImageData; alt: string }[] = [
   { icon: "person_search", title: "Request access", body: "Find a patient by Health ID and ask for exactly what you need, with a stated purpose.", img: doctorPhone, alt: "A doctor checking a phone" },
   { icon: "upload_file", title: "Submit records", body: "Add results, prescriptions and summaries with full provenance from your existing systems.", img: theatreNurse, alt: "A nurse preparing instruments in an operating theatre" },
   { icon: "lab_profile", title: "Connect your systems", body: "FHIR R4 integration with hashed API keys, rotation and a full audit trail.", img: researcher, alt: "Two researchers at a microscope" },
 ];
 
-function SectionHeading({ eyebrow, title, accent, children, center }: { eyebrow: string; title: string; accent?: string; children?: React.ReactNode; center?: boolean }) {
+function SectionHeading({ eyebrow, title, accent, children, center, id }: { eyebrow: string; title: string; accent?: string; children?: React.ReactNode; center?: boolean; id?: string }) {
   return (
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       <p className="eyebrow">{eyebrow}</p>
-      <h2 className="mt-3 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink sm:text-[2.5rem]">
+      <h2 id={id} className="mt-3 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] text-ink sm:text-[2.5rem]">
         {title} {accent && <span className="accent-word">{accent}</span>}
       </h2>
       {children && <p className="mt-4 text-[17px] leading-7 text-ink-3">{children}</p>}
@@ -64,7 +76,12 @@ function SectionHeading({ eyebrow, title, accent, children, center }: { eyebrow:
   );
 }
 
-export default function Landing() {
+export default async function Landing() {
+  const [live] = await withService((tx) => tx<{ facilities: number; states: number; patients: number; records: number }[]>`
+    select (select count(*)::int from healthcare_institutions where status = 'approved') as facilities,
+           (select count(distinct state)::int from healthcare_institutions where status = 'approved') as states,
+           (select count(*)::int from patients) as patients,
+           (select count(*)::int from medical_records) as records`).catch(() => [{ facilities: 0, states: 0, patients: 0, records: 0 }]);
   return (
     <PublicShell current="/">
       {/* Hero */}
@@ -90,11 +107,11 @@ export default function Landing() {
 
           <div className="relative mx-auto w-full max-w-[520px]">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[48px] rounded-bl-[160px] shadow-lg ring-8 ring-surface">
-              <Image src={heroDoctor} alt="A smiling young doctor in a white coat with a stethoscope" fill priority placeholder="blur" sizes="(min-width: 1024px) 520px, 90vw" className="object-cover object-top" />
+              <Image src={heroDoctor} alt="A smiling young doctor in a white coat with a stethoscope" fill priority placeholder="blur" sizes="(min-width: 1024px) 520px, 90vw" className="animate-ken-burns object-cover object-top" />
             </div>
-            <div className="absolute -left-4 top-14 hidden w-60 rounded-lg bg-surface p-4 shadow-lg ring-1 ring-line/70 sm:block lg:-left-14">
+            <div className="absolute -left-4 top-14 hidden w-60 animate-float rounded-lg bg-surface p-4 shadow-lg ring-1 ring-line/70 sm:block lg:-left-14 motion-reduce:animate-none">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-full bg-accent-50 text-accent-600"><Icon name="verified_user" size={22} filled /></span>
+                <span className="grid size-10 animate-pulse-ring place-items-center rounded-full bg-accent-50 text-accent-600 motion-reduce:animate-none"><Icon name="verified_user" size={22} filled /></span>
                 <div><p className="text-sm font-bold text-ink">Access approved</p><p className="text-xs text-ink-3">by the patient · 30 days</p></div>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -102,7 +119,7 @@ export default function Landing() {
                 <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700">Prescriptions</span>
               </div>
             </div>
-            <div className="absolute -right-2 bottom-20 hidden items-center gap-3 rounded-full bg-surface py-2.5 pl-2.5 pr-5 shadow-lg ring-1 ring-line/70 sm:flex lg:-right-8">
+            <div className="absolute -right-2 bottom-20 hidden animate-float-slow items-center gap-3 rounded-full bg-surface py-2.5 pl-2.5 pr-5 shadow-lg ring-1 ring-line/70 sm:flex lg:-right-8 motion-reduce:animate-none">
               <span className="grid size-10 place-items-center rounded-full bg-brand-600 text-white"><Icon name="visibility" size={20} /></span>
               <div><p className="text-sm font-bold text-ink">Every view logged</p><p className="text-xs text-ink-3">with a name and a reason</p></div>
             </div>
@@ -127,11 +144,11 @@ export default function Landing() {
       {/* Promises */}
       <section aria-label="Our promises" className="mx-auto max-w-[1240px] px-5 pt-16 sm:px-8">
         <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {PROMISES.map((p) => (
-            <li key={p.title} className="flex gap-4">
+          {PROMISES.map((p, i) => (
+            <Reveal as="li" key={p.title} delay={i * 80} className="flex gap-4">
               <span className={`grid size-14 shrink-0 place-items-center rounded-full ${p.tone === "blue" ? "bg-brand-50 text-brand-600" : "bg-accent-50 text-accent-600"}`}><Icon name={p.icon} size={26} /></span>
               <div><h3 className="text-[15px] font-bold text-ink">{p.title}</h3><p className="mt-1 text-sm leading-6 text-ink-3">{p.body}</p></div>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </section>
@@ -146,8 +163,8 @@ export default function Landing() {
           <Button asChild variant="secondary" className="self-start sm:self-auto"><Link href="/register">Get started<Icon name="arrow_forward" size={18} /></Link></Button>
         </div>
         <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {WHO.map((w) => (
-            <li key={w.title}>
+          {WHO.map((w, i) => (
+            <Reveal as="li" key={w.title} delay={i * 90}>
               <Link href={w.href} className="group relative block aspect-[4/5] overflow-hidden rounded-lg shadow-card">
                 <Image src={w.img} alt={w.alt} fill placeholder="blur" sizes="(min-width: 1024px) 290px, (min-width: 640px) 45vw, 90vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
                 <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-950/10 to-transparent" />
@@ -157,7 +174,7 @@ export default function Landing() {
                   <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/20 backdrop-blur transition-colors group-hover:bg-white group-hover:text-brand-700"><Icon name="arrow_forward" size={20} /></span>
                 </span>
               </Link>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </section>
@@ -189,23 +206,67 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Live network strip */}
+      <section aria-label="On the network today" className="mx-auto mt-24 max-w-[1240px] px-5 sm:px-8">
+        <div className="grid gap-6 rounded-xl bg-navy-950 px-6 py-10 text-white sm:grid-cols-2 sm:px-10 lg:grid-cols-4">
+          {[
+            ["domain", "Verified facilities", live.facilities],
+            ["map", "States with a verified facility", live.states],
+            ["groups", "People with a record", live.patients],
+            ["folder_open", "Records kept safe", live.records],
+          ].map(([icon, label, n], i) => (
+            <Reveal key={label as string} delay={i * 90} className="flex items-center gap-4">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-white/10 text-accent-200"><Icon name={icon as IconName} size={24} /></span>
+              <div><p className="text-3xl font-extrabold tracking-[-0.02em]"><CountUp value={n as number} /></p><p className="text-sm text-navy-200">{label}</p></div>
+            </Reveal>
+          ))}
+        </div>
+        <p className="mt-2 text-right text-xs text-ink-3">Live figures from this pilot. Demo environments use synthetic data.</p>
+      </section>
+
+      {/* Try it */}
+      <section aria-labelledby="try-title" className="mx-auto max-w-[1240px] px-5 pt-24 sm:px-8">
+        <Reveal><SectionHeading id="try-title" center eyebrow="Try it yourself" title="You're the patient." accent="What will you share?">
+          Tap the record types and the time limit. The preview shows exactly what the hospital would see. Nothing else leaves your record.
+        </SectionHeading></Reveal>
+        <Reveal delay={120} className="mt-12"><ConsentDemo /></Reveal>
+      </section>
+
+      {/* Built for Nigeria */}
+      <section aria-labelledby="ng-title" className="mx-auto max-w-[1240px] px-5 pt-24 sm:px-8">
+        <Reveal><SectionHeading id="ng-title" eyebrow="Built for Nigeria" title="Made for the health problems" accent="we actually face.">
+          From sickle cell to malaria, maternity to immunisation: features shaped around care in Nigeria.
+        </SectionHeading></Reveal>
+        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {NIGERIA.map((f, i) => (
+            <Reveal as="li" key={f.title} delay={(i % 3) * 90}>
+              <article className="card lift group h-full p-6">
+                <span className={`grid size-14 place-items-center rounded-full transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 ${f.tone}`}><Icon name={f.icon} size={28} /></span>
+                <h3 className="mt-5 text-lg font-bold text-ink">{f.title}</h3>
+                <p className="mt-2 text-[15px] leading-7 text-ink-3">{f.body}</p>
+              </article>
+            </Reveal>
+          ))}
+        </ul>
+      </section>
+
       {/* How it works */}
       <section id="how" aria-labelledby="how-title" className="mt-24 scroll-mt-24 bg-canvas py-24">
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
-          <SectionHeading center eyebrow="How it works" title="Three steps to" accent="a record that's yours.">
+          <SectionHeading id="how-title" center eyebrow="How it works" title="Three steps to" accent="a record that's yours.">
             Set up once. From then on, your history follows you — and you stay in charge of who sees it.
           </SectionHeading>
           <ol className="relative mt-16 grid gap-10 md:grid-cols-3">
             <span aria-hidden className="absolute left-[16%] right-[16%] top-8 hidden border-t-2 border-dashed border-brand-200 md:block" />
             {STEPS.map((s, i) => (
-              <li key={s.title} className="relative text-center">
+              <Reveal as="li" key={s.title} delay={i * 150} className="relative text-center">
                 <span className="relative mx-auto grid size-16 place-items-center rounded-full bg-surface text-brand-600 shadow-card ring-1 ring-line/70">
                   <Icon name={s.icon} size={28} />
                   <span className="absolute -right-1 -top-1 grid size-6 place-items-center rounded-full bg-accent-600 text-xs font-bold text-white">{i + 1}</span>
                 </span>
                 <h3 className="mt-6 text-lg font-bold text-ink">{s.title}</h3>
                 <p className="mx-auto mt-2 max-w-xs leading-7 text-ink-3">{s.body}</p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </div>
@@ -213,14 +274,14 @@ export default function Landing() {
 
       {/* Institutions */}
       <section id="institutions" aria-labelledby="inst-title" className="mx-auto max-w-[1240px] scroll-mt-24 px-5 pt-24 sm:px-8">
-        <SectionHeading center eyebrow="For hospitals, clinics and laboratories" title="We've got your" accent="clinical team covered.">
+        <SectionHeading id="inst-title" center eyebrow="For hospitals, clinics and laboratories" title="We've got your" accent="clinical team covered.">
           Keep your existing systems. Bring a patient's history into the consulting room — with their permission.
         </SectionHeading>
         <ul className="mt-14 grid gap-6 md:grid-cols-3">
-          {SERVICES.map((s) => (
-            <li key={s.title} className="card overflow-hidden">
+          {SERVICES.map((s, i) => (
+            <Reveal as="li" key={s.title} delay={i * 100} className="card lift group overflow-hidden">
               <div className="relative aspect-[16/10]">
-                <Image src={s.img} alt={s.alt} fill placeholder="blur" sizes="(min-width: 768px) 380px, 90vw" className="object-cover" />
+                <Image src={s.img} alt={s.alt} fill placeholder="blur" sizes="(min-width: 768px) 380px, 90vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
               </div>
               <div className="relative px-6 pb-6 pt-9">
                 <span className="absolute -top-7 left-6 grid size-14 place-items-center rounded-full bg-accent-600 text-white ring-4 ring-surface"><Icon name={s.icon} size={26} /></span>
@@ -230,7 +291,7 @@ export default function Landing() {
                 </div>
                 <p className="mt-2 text-[15px] leading-7 text-ink-3">{s.body}</p>
               </div>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </section>

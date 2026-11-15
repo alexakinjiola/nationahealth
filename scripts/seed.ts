@@ -14,7 +14,7 @@ import { dirname, join } from "node:path";
 import postgres from "postgres";
 import { hash } from "@node-rs/argon2";
 import { loadEnv } from "./env";
-import { adminClient, affiliate, as, createInstitution, createPatient, createProfessional, createUser, grantPlatformRole } from "./fixtures";
+import { adminClient, affiliate, as, createInstitution, createPatient, createProfessional, createRecord, createUser, grantPlatformRole } from "./fixtures";
 
 loadEnv();
 if (process.env.NODE_ENV === "production") throw new Error("Refusing to seed synthetic data in production.");
@@ -90,6 +90,9 @@ async function main() {
   await grantPlatformRole(sql, admin, "platform_admin");
   await grantPlatformRole(sql, admin, "security_officer");
   await grantPlatformRole(sql, admin, "support_agent");
+  await grantPlatformRole(sql, admin, "super_admin");
+  const analyst = await user("analyst@demo.continuum.test", "Kemi Analyst", "+2348000000102", DEMO_TOTP.admin);
+  await grantPlatformRole(sql, analyst, "analyst");
 
   // ── Institutions ──────────────────────────────────────────────────────────
   const owner = await user("owner.ikeja@demo.continuum.test", "Ronke Balogun", "+2348000000201", DEMO_TOTP.instAdmin);
@@ -216,6 +219,50 @@ async function main() {
   // A blocked attempt so the activity history shows denials.
   await as(app, nurseU, (tx) => tx`select app.provider_list_records(${ikeja}, ${ada.patientId})`);
 
+  // Emergency health profile for the main demo patient.
+  await sql`insert into patient_health_profiles(patient_id, blood_group, genotype, allergies, chronic_conditions, current_medications,
+              nhia_number, hmo_name, organ_donor, share_in_emergency)
+            values (${ada.patientId}, 'O+', 'AS', 'Penicillin (rash)', '{Hypertension}', 'Amlodipine 5 mg once daily',
+                    'NHIA-0042-7781', 'Synthetic Health HMO', true, true)`;
+
+  // A synthetic population so national reports have something to show.
+  // Deterministic pseudo-random choices keep the demo stable between resets.
+  const STATES = ["Lagos", "FCT", "Kano", "Rivers", "Oyo", "Kaduna", "Enugu", "Anambra", "Ogun", "Borno", "Delta", "Plateau"];
+  const CONDITIONS = ["Uncomplicated malaria", "Essential hypertension", "Type 2 diabetes mellitus", "Typhoid fever", "Sickle cell disease",
+    "Pulmonary tuberculosis", "Community-acquired pneumonia", "HIV infection, on ART", "Lassa fever (suspected)", "Acute watery diarrhoea (cholera)"];
+  const VACCINES = ["BCG", "OPV 1", "Pentavalent 1", "PCV 1", "Rotavirus 1", "Measles 1", "Yellow fever", "Pentavalent 3", "IPV", "Hepatitis B birth dose"];
+  const GENOTYPES = ["AA", "AA", "AA", "AS", "AS", "AC", "SS"];
+  const BLOOD = ["O+", "O+", "O+", "A+", "B+", "AB+", "O-", "A-"];
+  let seed = 7;
+  const rnd = (n: number) => { seed = (seed * 9301 + 49297) % 233280; return Math.floor((seed / 233280) * n); };
+  for (let i = 0; i < 160; i++) {
+    const child = i % 4 === 0;
+    const age = child ? 1 + rnd(9) : 18 + rnd(60);
+    const dob = new Date(Date.now() - (age * 365 + rnd(300)) * 86_400_000).toISOString().slice(0, 10);
+    const sex = rnd(2) ? "female" : "male";
+    const state = STATES[(i * 7 + rnd(5)) % STATES.length];
+    const p = await createPatient(sql, { fullName: `Synthetic Person ${i + 1}`, dob, sex, phone: null, verified: rnd(5) > 0 });
+    await sql`update patients set created_at = now() - ${`${rnd(85)} days`}::interval where id = ${p.patientId}`;
+    await sql`update patient_profiles set state_of_residence = ${state} where patient_id = ${p.patientId}`;
+    await sql`insert into patient_health_profiles(patient_id, blood_group, genotype, nhia_number)
+              values (${p.patientId}, ${BLOOD[rnd(BLOOD.length)]}, ${GENOTYPES[rnd(GENOTYPES.length)]}, ${rnd(3) === 0 ? `NHIA-${1000 + i}` : null})`;
+    const inst = [lagosIsland, ikeja, lab][rnd(3)];
+    const pro = (inst === lab ? bisi : inst === ikeja ? chidi : funmi).professionalId;
+    const by = inst === lab ? bisiU : inst === ikeja ? chidiU : funmiU;
+    if (child) {
+      for (let v = 0; v < 2 + rnd(6); v++) {
+        await createRecord(sql, { patientId: p.patientId, category: "vaccination", title: VACCINES[(v + rnd(3)) % VACCINES.length],
+          clinicalDate: daysAgo(rnd(80)), institutionId: lagosIsland, professionalId: funmi.professionalId, submittedBy: funmiU });
+      }
+    }
+    for (let c = 0; c < 1 + rnd(2); c++) {
+      const cond = CONDITIONS[(rnd(CONDITIONS.length) + (state === "Lagos" || state === "Rivers" ? 0 : rnd(2))) % CONDITIONS.length];
+      const rid = await createRecord(sql, { patientId: p.patientId, category: "diagnosis", title: cond, clinicalDate: daysAgo(rnd(88)),
+        institutionId: inst === lab ? lagosIsland : inst, professionalId: inst === lab ? funmi.professionalId : pro, submittedBy: inst === lab ? funmiU : by });
+      await sql`update medical_records set created_at = now() - ${`${rnd(85)} days`}::interval where id = ${rid}`;
+    }
+  }
+
   // Support & security examples.
   await as(app, halimaU, (tx) => tx`select app.create_support_ticket('identity_verification', 'Help verifying my identity',
     'I do not have my NIN slip with me. Can I verify at Lagos Island General Hospital?', null, null)`);
@@ -233,7 +280,8 @@ Synthetic demo data created. Password for every demo account: ${DEMO_PASSWORD}
   Lab scientist, Meridian           lab.ogun@demo.continuum.test    TOTP ${DEMO_TOTP.lab}
   Institution admin, Ikeja          owner.ikeja@demo.continuum.test TOTP ${DEMO_TOTP.instAdmin}
   Nurse (licence pending)           nurse.ibrahim@demo.continuum.test TOTP ${DEMO_TOTP.clinician}
-  Platform admin + security         admin@demo.continuum.test       TOTP ${DEMO_TOTP.admin}
+  Super admin (all platform roles)  admin@demo.continuum.test       TOTP ${DEMO_TOTP.admin}
+  Health data analyst (reports)     analyst@demo.continuum.test     TOTP ${DEMO_TOTP.admin}
 
 Staff accounts require an authenticator code: add the TOTP secret to any authenticator app.`);
 }

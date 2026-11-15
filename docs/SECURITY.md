@@ -81,3 +81,28 @@ This describes what's actually implemented and how it's verified. It isn't a cer
 - Provider adapters (ClamAV, Supabase Storage, Termii, Africa's Talking) are verified against local protocol mocks, **not** the real services. Run each against its sandbox or staging before the pilot (checklist in DEPLOYMENT.md).
 - Breached-password checking fails open during an HIBP outage, which is a deliberate availability trade-off.
 - Screen-reader behaviour is verified through automated accessibility-tree, keyboard and axe checks. Manual testing with TalkBack and VoiceOver by people who use them is still required.
+
+## Super-admin oversight access to clinical records (migration 019)
+
+The original brief kept platform staff away from clinical data entirely. The product owner later required that a super administrator be able to view any patient's record with a full audit trail. The control is designed to stay defensible under the NDPA 2023:
+
+| Control | How it's enforced |
+|---|---|
+| Separate permission | `records:oversight` is held only by the `super_admin` role (or a custom role created by a super admin). `platform_admin` doesn't have it. |
+| Purpose | `app.oversight_open` needs a written reason of at least 15 characters, stored with the session and with every view. |
+| Strong authentication | Admin console requires MFA; opening a session requires a fresh step-up (authenticator code within 10 minutes). |
+| Time limit | Sessions close after `oversight.session_minutes` (30 by default) or when the admin ends them. Every read function calls `app.oversight_require`. |
+| Transparency | The patient (and their representatives) get a security notification naming the admin and the reason, and every view appears under "Platform oversight of your record" in their activity history. |
+| Detection | Security officers are notified when a session opens. Each list view and record view is written to the hash-chained `audit_logs` (`oversight.*`). |
+| Minimisation | Read-only. Attachments can't be downloaded from the oversight console. |
+| Separation of duties | Only a super admin can create or assign oversight-capable roles; the last super admin can't be removed; nobody can change their own roles. |
+
+Legal basis, retention of oversight logs and the policy for when oversight is justified must be confirmed by Nigerian privacy counsel before production use (see DPIA_TEMPLATE.md).
+
+## Configurable roles (migration 019)
+
+Permissions come from the `capabilities` catalogue. Institutions can create custom roles from institution permissions only; platform admins (with `roles:manage`) can create custom platform roles. `app.has_platform_role(key)` returns true for a super admin, or when a user's combined custom roles cover every permission of the system role, so existing checks keep working. Every role change is audited and the affected person is notified.
+
+## National reports
+
+`app.admin_report` returns aggregates only and requires `reports:view`. Counts between 1 and 4 in demographic, geographic and condition breakdowns are returned as `-1` and shown as "<5" (`app.k_anon`). Opening a report is audited.

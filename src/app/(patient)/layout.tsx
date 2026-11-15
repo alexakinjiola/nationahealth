@@ -17,6 +17,8 @@ export default async function PatientLayout({ children }: { children: React.Reac
     { href: "/dashboard", label: "Overview", icon: "home" },
     { href: "/records", label: "My health records", icon: "folder_open" },
     { href: "/timeline", label: "Health timeline", icon: "timeline" },
+    { href: "/health-profile", label: "Emergency profile", icon: "emergency_home" },
+    { href: "/immunisations", label: "Immunisations", icon: "vaccines" },
     { href: "/access", label: "Access & sharing", icon: "shield_person", badge: c.pending },
     { href: "/activity", label: "Activity history", icon: "history" },
     { href: "/notifications", label: "Notifications", icon: "notifications", badge: c.unread },

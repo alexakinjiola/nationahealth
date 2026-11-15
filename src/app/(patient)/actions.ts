@@ -209,3 +209,27 @@ export async function requestRepresentationAction(input: unknown) {
     return { reference: r.ref as string };
   }, "Request sent. Our team will ask for legal documents before activating it.");
 }
+
+// ── Emergency health profile ────────────────────────────────────────────────
+const healthProfileSchema = z.object({
+  bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"]),
+  genotype: z.enum(["AA", "AS", "AC", "SS", "SC", "CC", "unknown"]),
+  allergies: z.string().trim().max(500).optional().default(""),
+  conditions: z.array(z.string().trim().min(2).max(80)).max(20).default([]),
+  medications: z.string().trim().max(500).optional().default(""),
+  nhiaNumber: z.string().trim().max(30).regex(/^$|^[A-Za-z0-9/-]{4,30}$/, "Use letters, numbers, / or - only.").optional().default(""),
+  hmoName: z.string().trim().max(120).optional().default(""),
+  organDonor: z.boolean().default(false),
+  pregnant: z.boolean().nullable().optional(),
+  disabilities: z.string().trim().max(300).optional().default(""),
+  shareInEmergency: z.boolean().default(true),
+});
+
+export async function saveHealthProfileAction(input: unknown) {
+  return handle("health_profile", async () => {
+    const v = parse(healthProfileSchema, input);
+    const { actor, patientId } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`select app.save_health_profile(${patientId}, ${v.bloodGroup}, ${v.genotype}, ${v.allergies},
+      ${v.conditions}, ${v.medications}, ${v.nhiaNumber}, ${v.hmoName}, ${v.organDonor}, ${v.pregnant ?? null}, ${v.disabilities}, ${v.shareInEmergency})`, await requestMeta());
+  }, "Emergency profile saved.");
+}

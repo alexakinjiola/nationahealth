@@ -41,6 +41,8 @@ export interface Actor {
   affiliations: Affiliation[];
   ownedInstitutionDrafts: { id: string; name: string; status: string }[];
   platformRoles: string[];
+  /** Union of permissions across the user's platform roles (system and custom). */
+  platformCapabilities: string[];
   representations: Representation[];
 }
 
@@ -63,7 +65,19 @@ async function loadActor(session: SessionRow): Promise<Actor | null> {
           order by a.created_at`
       : [];
     const drafts = await tx`select id, name, status from healthcare_institutions where created_by = ${u.id} order by created_at`;
-    const roles = await tx`select r.key from user_platform_roles upr join roles r on r.id = upr.role_id where upr.user_id = ${u.id}`;
+    // Effective platform roles: those held, every system role for a super admin, and any
+    // system role whose permissions are fully covered by custom roles (mirrors app.has_platform_role).
+    const [pr] = await tx<{ caps: string[]; held: string[] }[]>`
+      select app.platform_capabilities(${u.id}) as caps,
+             coalesce((select array_agg(r.key) from user_platform_roles upr join roles r on r.id = upr.role_id where upr.user_id = ${u.id}), '{}') as held`;
+    const systemRoles = pr.held.length
+      ? await tx<{ key: string; capabilities: string[] }[]>`select key, capabilities from roles where scope = 'platform' and is_system`
+      : [];
+    const effective = new Set(pr.held);
+    for (const r of systemRoles) {
+      if (pr.held.includes("super_admin") || (r.capabilities.length && r.capabilities.every((c) => pr.caps.includes(c)))) effective.add(r.key);
+    }
+    const roles = [...effective].map((key) => ({ key }));
     const reps = await tx`
       select pr.patient_id, pp.full_name, pr.relationship
       from patient_representatives pr join patient_profiles pp on pp.patient_id = pr.patient_id
@@ -92,6 +106,7 @@ async function loadActor(session: SessionRow): Promise<Actor | null> {
       })),
       ownedInstitutionDrafts: drafts.map((d) => ({ id: d.id, name: d.name, status: d.status })),
       platformRoles: roles.map((r) => r.key),
+      platformCapabilities: pr.caps,
       representations: reps.map((r) => ({ patientId: r.patient_id, fullName: r.full_name, relationship: r.relationship })),
     } satisfies Actor;
   });
@@ -147,9 +162,18 @@ export async function requirePatientContext(next = "/dashboard") {
   redirect(homeFor(actor));
 }
 
-export async function requirePlatformRole(roles: string[] = ["platform_admin", "security_officer", "support_agent"]) {
+export async function requirePlatformRole(roles?: string[]) {
   const actor = await requireActor({ next: "/admin" });
-  if (!actor.platformRoles.some((r) => roles.includes(r))) redirect(actor.platformRoles.length ? "/admin" : homeFor(actor));
+  if (!actor.platformRoles.length) redirect(homeFor(actor));
+  if (roles && !actor.platformRoles.some((r) => roles.includes(r) || r === "super_admin")) redirect("/admin");
+  return actor;
+}
+
+/** Gate an admin page on a single permission (works with custom roles). */
+export async function requirePlatformCapability(cap: string) {
+  const actor = await requireActor({ next: "/admin" });
+  if (!actor.platformRoles.length) redirect(homeFor(actor));
+  if (!actor.platformCapabilities.includes(cap)) redirect("/admin");
   return actor;
 }
 
