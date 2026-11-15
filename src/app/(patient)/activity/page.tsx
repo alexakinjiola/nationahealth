@@ -8,6 +8,9 @@ import { Pagination } from "@/components/ui/pagination";
 import { FilterBar, FilterField, filterControl } from "@/components/ui/filter-bar";
 import { ActivityItem, type ActivityRow } from "@/components/domain/activity-item";
 import { ReportButton } from "./report";
+import { withActor } from "@/lib/db";
+import { Icon } from "@/components/ui/icon";
+import { formatDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Activity history" };
 
@@ -28,6 +31,8 @@ export default async function ActivityPage({ searchParams }: { searchParams: Pro
     page: Number(sp.page) || 1,
   };
   const d = await activity(actor.userId, patientId, f);
+  const oversight = await withActor(actor.userId, (tx) => tx<{ occurred_at: string; action: string; admin_name: string | null; reason: string | null; record_title: string | null }[]>`
+    select * from app.patient_oversight_activity(${patientId})`);
   const qs = (page: number) => `/activity?${new URLSearchParams({ ...Object.fromEntries(Object.entries(f).filter(([, v]) => v && typeof v === "string")) as Record<string, string>, page: String(page) })}`;
 
   return (
@@ -37,6 +42,28 @@ export default async function ActivityPage({ searchParams }: { searchParams: Pro
         description="Every request, view, download and permission change involving your records — including attempts we blocked."
         actions={<ReportButton />}
       />
+      {oversight.length > 0 && (
+        <Card className="mb-6 overflow-hidden border-warning-line">
+          <div className="flex items-start gap-4 bg-warning-bg/70 px-5 py-4 sm:px-6">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-surface text-warning-fg"><Icon name="policy" size={22} /></span>
+            <div>
+              <h2 className="text-base font-bold text-ink">Platform oversight of your record</h2>
+              <p className="text-sm text-ink-3">A platform administrator can open records for investigations or legal obligations. They must give a reason, access ends after 30 minutes, and every view is listed here.</p>
+            </div>
+          </div>
+          <ul className="divide-y divide-line/80">
+            {oversight.map((o, i) => (
+              <li key={i} className="flex gap-4 px-5 py-3.5 text-sm sm:px-6">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-warning-bg text-warning-fg"><Icon name={o.action === "oversight.session_opened" ? "lock_open" : "visibility"} size={18} /></span>
+                <div className="min-w-0">
+                  <p className="font-medium text-ink">{o.admin_name ?? "A platform administrator"} {o.action === "oversight.session_opened" ? "opened your record" : o.action === "oversight.record_viewed" ? `viewed ${o.record_title ? `"${o.record_title}"` : "a record"}` : "viewed your list of records"}</p>
+                  <p className="text-ink-3"><time dateTime={o.occurred_at}>{formatDateTime(o.occurred_at)}</time>{o.reason ? ` · Reason: ${o.reason}` : ""}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
       <FilterBar resetHref="/activity" label="Filter activity">
         <FilterField label="Type">
           <select name="kind" defaultValue={f.kind ?? ""} className={filterControl}>

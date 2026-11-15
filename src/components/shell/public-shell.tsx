@@ -8,6 +8,7 @@ const NAV: [string, string][] = [
   ["Home", "/"],
   ["How it works", "/#how"],
   ["Patients", "/#who"],
+  ["Find a facility", "/facilities"],
   ["Institutions", "/#institutions"],
   ["Privacy", "/privacy"],
 ];
@@ -15,7 +16,7 @@ const NAV: [string, string][] = [
 const FOOTER: { title: string; links: [string, string][] }[] = [
   { title: "Patients", links: [["Create a record", "/register"], ["Sign in", "/sign-in"], ["Account help", "/help/account-recovery"]] },
   { title: "Institutions", links: [["Register your institution", "/register/provider"], ["Staff sign in", "/sign-in"], ["How access works", "/#how"]] },
-  { title: "Trust", links: [["Privacy notice", "/privacy"], ["Your rights", "/privacy"]] },
+  { title: "Trust", links: [["Find a verified facility", "/facilities"], ["Privacy notice", "/privacy"], ["Your rights", "/privacy"]] },
 ];
 
 export function PublicShell({ children, current }: { children: React.ReactNode; current?: string }) {

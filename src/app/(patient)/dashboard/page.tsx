@@ -4,6 +4,8 @@ import Image from "next/image";
 import doctorChild from "../../../../public/images/doctor-child.webp";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stat } from "@/components/ui/stat";
+import { ProgressRing, Reveal } from "@/components/ui/motion";
+import { withActor } from "@/lib/db";
 import { requirePatientContext } from "@/lib/auth/actor";
 import { dashboardData } from "@/server/patient";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +31,10 @@ function greeting() {
 export default async function DashboardPage() {
   const { actor, patientId, actingAs } = await requirePatientContext("/dashboard");
   const d = await dashboardData(actor.userId, patientId);
+  const [hp] = await withActor(actor.userId, (tx) => tx<{ blood_group: string; genotype: string; allergies: string | null; chronic_conditions: string[]; nhia_number: string | null }[]>`
+    select blood_group, genotype, allergies, chronic_conditions, nhia_number from patient_health_profiles where patient_id = ${patientId}`);
+  const hpScore = Math.round(([hp?.blood_group && hp.blood_group !== "unknown", hp?.genotype && hp.genotype !== "unknown", !!hp?.allergies,
+    (hp?.chronic_conditions?.length ?? 0) > 0, !!hp?.nhia_number, !!d.profile.emergency_contact_name].filter(Boolean).length / 6) * 100);
   const v = VERIFICATION[d.profile.verification_status];
   const firstName = d.profile.full_name.split(" ")[0];
 
@@ -95,12 +101,12 @@ export default async function DashboardPage() {
       )}
 
       <section aria-label="Summary" className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Medical records" value={d.counts.records} hint={`${d.counts.uploads} uploaded by you`} icon="folder_open" href="/records" />
-        <Stat label="Contributing institutions" value={d.counts.institutions} hint="Hospitals and labs" icon="domain" href="/timeline" />
-        <Stat label="Active permissions" value={d.perm.active} icon="shield_person" href="/access?tab=active"
-          hint={d.perm.next_expiry ? `Next ends ${formatDate(d.perm.next_expiry)}` : "No one has access right now"} />
-        <Stat label="Pending requests" value={d.pending.length} icon="pending_actions" href="/access" tone={d.pending.length ? "attention" : "neutral"}
-          hint={d.pending.length ? "Needs your decision" : "You're all caught up"} />
+        <Reveal><Stat label="Medical records" value={d.counts.records} hint={`${d.counts.uploads} uploaded by you`} icon="folder_open" href="/records" /></Reveal>
+        <Reveal delay={80}><Stat label="Contributing institutions" value={d.counts.institutions} hint="Hospitals and labs" icon="domain" href="/timeline" /></Reveal>
+        <Reveal delay={160}><Stat label="Active permissions" value={d.perm.active} icon="shield_person" href="/access?tab=active"
+          hint={d.perm.next_expiry ? `Next ends ${formatDate(d.perm.next_expiry)}` : "No one has access right now"} /></Reveal>
+        <Reveal delay={240}><Stat label="Pending requests" value={d.pending.length} icon="pending_actions" href="/access" tone={d.pending.length ? "attention" : "neutral"}
+          hint={d.pending.length ? "Needs your decision" : "You're all caught up"} /></Reveal>
       </section>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -145,6 +151,21 @@ export default async function DashboardPage() {
         </div>
 
         <div className="space-y-6">
+          <Card className="overflow-hidden">
+            <div className="flex items-center gap-4 bg-gradient-to-r from-danger-bg to-warning-bg/60 px-5 py-4">
+              <ProgressRing value={hpScore} size={64} stroke={7} color="var(--color-danger-600)"><span className="text-sm font-bold text-ink">{hpScore}%</span></ProgressRing>
+              <div><p className="font-bold text-ink">Emergency profile</p><p className="text-[13px] text-ink-3">{hpScore === 100 ? "Ready for any emergency" : "A few details missing"}</p></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 p-5">
+              <div className="rounded-lg bg-danger-bg/60 p-3 text-center"><p className="text-[11px] font-semibold uppercase tracking-wider text-danger-fg">Blood group</p><p className="mt-0.5 text-2xl font-extrabold text-ink">{hp?.blood_group && hp.blood_group !== "unknown" ? hp.blood_group : "—"}</p></div>
+              <div className="rounded-lg bg-warning-bg/70 p-3 text-center"><p className="text-[11px] font-semibold uppercase tracking-wider text-warning-fg">Genotype</p><p className="mt-0.5 text-2xl font-extrabold text-ink">{hp?.genotype && hp.genotype !== "unknown" ? hp.genotype : "—"}</p></div>
+            </div>
+            <div className="flex gap-2 border-t border-line/80 px-5 py-3">
+              <Link href="/health-profile" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"><Icon name="emergency_home" size={18} />{hp ? "Update" : "Set up"}</Link>
+              <span className="text-line-strong">·</span>
+              <Link href="/immunisations" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"><Icon name="vaccines" size={18} />Immunisations</Link>
+            </div>
+          </Card>
           <Card>
             <CardHeader className="items-center"><CardTitle>Notifications</CardTitle><Link href="/notifications" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700">See all<Icon name="chevron_right" size={18} /></Link></CardHeader>
             {d.notifications.length === 0 ? <CardBody><p className="text-sm text-ink-3">Nothing new.</p></CardBody> : (

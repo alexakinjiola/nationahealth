@@ -15,18 +15,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     (select count(*)::int from healthcare_institutions where status in ('submitted','under_review')) as inst,
     (select count(*)::int from security_incidents where status in ('open','investigating')) as inc,
     (select count(*)::int from support_tickets where status in ('open','in_progress')) as tickets`);
+  const can = (c: string) => actor.platformCapabilities.includes(c);
   const nav: NavItem[] = [{ href: "/admin", label: "Overview", icon: "dashboard", exact: true }];
+  if (can("reports:view")) nav.push({ href: "/admin/reports", label: "Reports & analytics", icon: "monitoring" });
   if (has("platform_admin")) nav.push({ href: "/admin/institutions", label: "Institutions", icon: "domain", badge: c.inst }, { href: "/admin/professionals", label: "Professional verification", icon: "badge" });
-  if (has("platform_admin") || has("support_agent")) nav.push({ href: "/admin/patients", label: "Patient accounts", icon: "manage_accounts" });
+  if (has("platform_admin") || has("support_agent") || can("records:oversight")) nav.push({ href: "/admin/patients", label: "Patients", icon: "manage_accounts" });
+  if (can("users:manage")) nav.push({ href: "/admin/users", label: "Users & access", icon: "group" });
+  if (can("roles:manage")) nav.push({ href: "/admin/roles", label: "Roles & permissions", icon: "admin_panel_settings" });
   if (has("security_officer")) nav.push({ href: "/admin/security", label: "Security & incidents", icon: "security", badge: c.inc });
-  if (has("security_officer") || has("platform_admin")) nav.push({ href: "/admin/audit", label: "Audit logs", icon: "fact_check" });
+  if (has("security_officer") || has("platform_admin") || can("audit:read")) nav.push({ href: "/admin/audit", label: "Audit trail", icon: "fact_check" });
   if (has("support_agent") || has("platform_admin")) nav.push({ href: "/admin/support", label: "Support", icon: "support_agent", badge: c.tickets });
   if (has("platform_admin")) nav.push({ href: "/admin/settings", label: "System settings", icon: "settings" });
+  const oversight = can("records:oversight");
   return (
-    <AppShell variant="admin" nav={nav} logoSuffix="Admin" synthetic={actor.isSynthetic}
+    <AppShell variant="admin" nav={nav} logoSuffix={actor.platformRoles.includes("super_admin") ? "Super admin" : "Admin"} synthetic={actor.isSynthetic}
       sidebarFooter={<div className="rounded-md border border-danger-fg/40 bg-danger-fg/10 p-3 text-xs leading-5 text-navy-200">
         <p className="flex items-center gap-1.5 font-semibold text-white"><Icon name="policy" size={16} />Restricted console</p>
-        Every action is audited. Clinical records are not accessible from here.</div>}
+        {oversight ? "Every action is audited. Opening a patient record needs a reason, expires after 30 minutes and is shown to the patient." : "Every action is audited. Clinical records are not accessible from here."}</div>}
       topRight={<>
         <NotificationBell count={c.unread} href="/admin" />
         <UserMenu name={actor.displayName} email={actor.email} signOut={signOutAction}

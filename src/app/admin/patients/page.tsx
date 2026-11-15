@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
 import { requirePlatformRole } from "@/lib/auth/actor";
 import { withActor } from "@/lib/db";
@@ -19,6 +21,7 @@ export default async function PatientsAdmin({ searchParams }: { searchParams: Pr
   const actor = await requirePlatformRole(["platform_admin", "support_agent"]);
   const { q } = await searchParams;
   const isAdmin = actor.platformRoles.includes("platform_admin");
+  const oversight = actor.platformCapabilities.includes("records:oversight");
   const d = await withActor(actor.userId, async (tx) => ({
     patients: await tx`select * from app.admin_list_patients(${q?.trim() || null}, 50, 0)`,
     queue: await tx`select * from app.admin_identity_queue()`,
@@ -26,8 +29,10 @@ export default async function PatientsAdmin({ searchParams }: { searchParams: Pr
   }));
   return (
     <div className="animate-fade-in space-y-6">
-      <PageHeader title="Patient accounts" description="Account status, identity verification and reconciliation. Clinical records are not visible here." />
-      <Callout tone="info" icon="policy">You're seeing support metadata only: name, contact, identifiers and status. Every action below is audited.</Callout>
+      <PageHeader title="Patients" description={oversight ? "Account status, identity verification, and oversight access to individual records." : "Account status, identity verification and reconciliation. Clinical records are not visible here."} />
+      <Callout tone={oversight ? "warning" : "info"} icon="policy">{oversight
+        ? "Opening a patient's record needs a written reason and your authenticator code. The session lasts 30 minutes, every page you open is written to the audit trail, and the patient is told who looked and why."
+        : "You're seeing support metadata only: name, contact, identifiers and status. Every action below is audited."}</Callout>
       <Card>
         <CardHeader><CardTitle>Identity verification queue ({d.queue.length})</CardTitle></CardHeader>
         {d.queue.length === 0 ? <EmptyState compact icon="how_to_reg" title="No checks waiting" /> : (
@@ -80,7 +85,7 @@ export default async function PatientsAdmin({ searchParams }: { searchParams: Pr
                 <Td><Badge tone={VERIFICATION[p.verification_status]?.tone}>{VERIFICATION[p.verification_status]?.label}</Badge></Td>
                 <Td><Badge tone={p.account_status === "active" ? "success" : "danger"}>{p.account_status}</Badge></Td>
                 <Td className="text-ink-3">{p.last_login_at ? formatDateTime(p.last_login_at) : "Never"}</Td>
-                <Td className="text-right">{p.user_id && (p.account_status === "active"
+                <Td className="whitespace-nowrap text-right space-x-1">{oversight && <Button asChild size="sm" variant="secondary"><Link href={`/admin/patients/${p.patient_id}`}>Open record</Link></Button>}{p.user_id && (p.account_status === "active"
                   ? <AdminAction label="Suspend" variant="ghost" tone="danger" title={`Suspend ${p.full_name}'s account`} description="Signs them out everywhere. Use for suspected compromise or a verified request." action={setUserStatusAction.bind(null, p.user_id, "suspended")} />
                   : <AdminAction label="Reactivate" variant="secondary" title="Reactivate account" description="Also clears any login lockout." action={setUserStatusAction.bind(null, p.user_id, "active")} />)}</Td>
               </Tr>
