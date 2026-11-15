@@ -11,8 +11,13 @@ declare global {
 /** Shared pool. The login role itself has no table privileges. */
 export function db(): Sql {
   if (!globalThis.__continuumSql) {
-    globalThis.__continuumSql = postgres(env().DATABASE_URL, {
-      max: 10,
+    const url = env().DATABASE_URL;
+    globalThis.__continuumSql = postgres(url, {
+      // Serverless instances each hold their own pool, so keep it small there.
+      max: process.env.VERCEL ? 3 : 10,
+      // Transaction-mode poolers (Supabase/Supavisor on port 6543, PgBouncer)
+      // can't hold named prepared statements across transactions.
+      prepare: !/:6543(\/|$)/.test(url) && process.env.DB_PREPARE !== "false",
       idle_timeout: 30,
       connect_timeout: 10,
       onnotice: () => {},
