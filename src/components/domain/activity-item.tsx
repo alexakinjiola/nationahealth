@@ -50,7 +50,7 @@ export function ActivityItem({ a, action, compact }: { a: ActivityRow; action?: 
   const k = KIND[a.kind] ?? KIND.other;
   return (
     <li className={cn("flex gap-4", compact ? "py-3" : "px-5 py-4 sm:px-6")}>
-      <span className={cn("grid size-9 shrink-0 place-items-center rounded-full", k.tone)}><Icon name={k.icon} size={18} /></span>
+      <span className={cn("grid size-9 shrink-0 place-items-center rounded-md", k.tone)}><Icon name={k.icon} size={18} /></span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium leading-6 text-ink">{describeActivity(a)}</p>
         <p className="text-[13px] text-ink-3">

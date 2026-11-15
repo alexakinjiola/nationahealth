@@ -17,7 +17,7 @@ export default async function VerifyEmailPage() {
     <div className="animate-slide-up">
       <span className="grid size-12 place-items-center rounded-full bg-brand-50 text-brand-700"><Icon name="mark_email_read" size={26} /></span>
       <p className="eyebrow mt-6">Step 2 of 3 · Confirm your email</p>
-      <h1 className="mt-2 font-display text-[2rem] font-medium leading-tight text-ink">Check your inbox</h1>
+      <h1 className="mt-2 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Check your inbox</h1>
       <p className="mt-3 text-[15px] leading-7 text-ink-2">
         We sent a confirmation link to <strong className="font-semibold text-ink">{actor.email}</strong>. Open it on any device to continue.
         The link expires in 24 hours.

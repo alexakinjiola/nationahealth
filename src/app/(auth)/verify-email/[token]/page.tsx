@@ -14,7 +14,7 @@ export default async function VerifyTokenPage({ params }: { params: Promise<{ to
       <span className={`grid size-12 place-items-center rounded-full ${ok ? "bg-success-bg text-success-fg" : "bg-danger-bg text-danger-fg"}`}>
         <Icon name={ok ? "check_circle" : "link_off"} size={26} filled />
       </span>
-      <h1 className="mt-6 font-display text-[2rem] font-medium leading-tight text-ink">{ok ? "Email confirmed" : "This link no longer works"}</h1>
+      <h1 className="mt-6 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">{ok ? "Email confirmed" : "This link no longer works"}</h1>
       <p className="mt-3 text-[15px] leading-7 text-ink-2">
         {ok ? "Thanks — your email address is confirmed. Let's finish setting up your account."
           : "It may have expired or already been used. Sign in and we'll send you a new one."}

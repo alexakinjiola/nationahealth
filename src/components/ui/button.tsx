@@ -11,7 +11,8 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: "bg-brand-600 text-white shadow-xs hover:bg-brand-700 active:bg-brand-800",
-        secondary: "border border-line-strong bg-surface text-ink shadow-xs hover:border-ink-3/50 hover:bg-sunken/60",
+        ink: "bg-ink text-white shadow-xs hover:bg-navy-700 active:bg-navy-900",
+        secondary: "border border-line-strong bg-surface text-ink shadow-xs hover:border-ink/40 hover:bg-canvas",
         ghost: "text-ink-2 hover:bg-sunken hover:text-ink",
         danger: "bg-danger-600 text-white shadow-xs hover:bg-danger-fg",
         "danger-outline": "border border-danger-line bg-surface text-danger-fg hover:bg-danger-bg",

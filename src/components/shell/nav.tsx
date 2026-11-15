@@ -23,10 +23,11 @@ export function SideNav({ items, dark, onNavigate }: { items: NavItem[]; dark?: 
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "group flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
+                "group relative flex h-10 items-center gap-3 rounded-md px-3 text-[14px] font-medium transition-colors",
+                "before:absolute before:-left-4 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:transition-colors",
                 dark
-                  ? active ? "bg-white/[0.09] text-white" : "text-navy-200 hover:bg-white/[0.05] hover:text-white"
-                  : active ? "bg-surface text-ink shadow-xs ring-1 ring-line" : "text-ink-2 hover:bg-sunken hover:text-ink",
+                  ? active ? "bg-white/[0.07] text-white before:bg-brand-200" : "text-navy-200 hover:bg-white/[0.04] hover:text-white"
+                  : active ? "bg-sunken/80 text-ink before:bg-brand-600" : "text-ink-2 hover:bg-sunken/60 hover:text-ink",
               )}
             >
               <Icon name={item.icon} size={20} filled={active}
@@ -34,7 +35,7 @@ export function SideNav({ items, dark, onNavigate }: { items: NavItem[]; dark?: 
               <span className="flex-1">{item.label}</span>
               {!!item.badge && (
                 <span className={cn("min-w-5 rounded-full px-1.5 text-center text-xs font-semibold leading-5 tabular",
-                  dark ? "bg-brand-500 text-white" : "bg-warning-bg text-warning-fg ring-1 ring-inset ring-warning-line")}>
+                  dark ? "bg-brand-500 text-white" : "bg-clay-50 text-clay-700 ring-1 ring-inset ring-clay-100")}>
                   {item.badge}<span className="sr-only"> pending</span>
                 </span>
               )}

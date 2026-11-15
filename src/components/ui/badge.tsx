@@ -24,7 +24,7 @@ export function Badge({
   tone = "neutral", icon, dot, className, children,
 }: { tone?: Tone; icon?: IconName; dot?: boolean; className?: string; children: React.ReactNode }) {
   return (
-    <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap", TONES[tone], className)}>
+    <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-sm px-2 text-xs font-medium ring-1 ring-inset whitespace-nowrap", TONES[tone], className)}>
       {icon ? <Icon name={icon} size={14} filled /> : dot ? <span className={cn("size-1.5 rounded-full", DOT[tone])} aria-hidden /> : null}
       {children}
     </span>
