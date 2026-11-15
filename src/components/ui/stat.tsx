@@ -11,12 +11,12 @@ export function Stat({
         <span className="text-[13px] font-medium text-ink-3">{label}</span>
         {icon && <Icon name={icon} size={20} className={tone === "attention" ? "text-warning-fg" : "text-ink-3"} />}
       </div>
-      <p className="mt-3 text-[1.75rem] font-semibold leading-none tracking-[-0.02em] text-ink tabular">{value}</p>
+      <p className="mt-3 font-display text-[2.4rem] font-normal leading-none tracking-[-0.02em] text-ink tabular">{value}</p>
       {hint && <p className="mt-2 text-xs text-ink-3">{hint}</p>}
     </>
   );
   const cls = cn(
-    "block rounded-lg border bg-surface p-4 shadow-xs sm:p-5",
+    "block rounded-lg border bg-surface p-4 sm:p-5",
     tone === "attention" ? "border-warning-line" : "border-line",
     href && "transition-colors hover:border-line-strong hover:bg-canvas/40",
   );

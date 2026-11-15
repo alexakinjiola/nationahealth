@@ -24,7 +24,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   return (
     <div className="animate-slide-up">
       <p className="eyebrow">Staff invitation</p>
-      <h1 className="mt-2 font-display text-[2rem] font-medium leading-tight text-ink">Join {inv.institution}</h1>
+      <h1 className="mt-2 font-display text-[2.4rem] font-normal leading-[1.08] tracking-[-0.025em] text-ink">Join {inv.institution}</h1>
       <p className="mt-2 text-[15px] text-ink-3">You've been invited as <strong className="text-ink">{inv.role}</strong>.</p>
       <div className="mt-8">
         {!actor ? (

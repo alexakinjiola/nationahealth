@@ -1,28 +1,31 @@
 # Design system
 
-**Intent:** calm, clinical and trustworthy, never generic. Warm paper canvas, deep teal brand, navy ink. Restraint over decoration: 1px warm borders, small radii, almost no shadow, no gradients or glass.
+**Intent:** a well-made printed record, not a software template. Warm paper canvas, forest-green brand, green-black ink and a single clay accent for things that need the patient's attention. Editorial serif headlines, hairline rules instead of boxes, small radii, almost no shadow, no gradients or glass. The landing page illustrates with real-looking clinical paper (a lab report, a consent slip, a verification stamp), drawn in code — never stock imagery.
 
 ## Typography
 
 | Role | Face | Use |
 |---|---|---|
-| Display | Newsreader (variable serif) | Patient greetings, page-defining headlines, landing. Human and editorial, used sparingly. |
-| UI | Public Sans (variable) | Everything else. Designed for public services, with very high legibility at small sizes. |
-| Data | IBM Plex Mono | Health IDs, references (`REQ-…`, `PRM-…`), licence numbers, hashes |
+| Display | Newsreader (variable serif) | Every page title, section headings, key numbers. Light weights and italics for emphasis. |
+| UI | Schibsted Grotesk (variable) | Everything else. A newsroom grotesk with more character than a default system face, still very legible at small sizes. |
+| Data | IBM Plex Mono | Health IDs, references (`REQ-…`, `PRM-…`), dates in lists, eyebrow labels |
 
-All three are self-hosted through `@fontsource`, so the browser makes no third-party font requests. The scale runs 11 / 12 / 14 / 16 / 18 / 22 / 28 / 36 / 48 px (`--text-*` in `globals.css`).
+All three are self-hosted through `@fontsource`, so the browser makes no third-party font requests. The scale runs 11 / 12 / 14 / 16 / 18 / 22 / 28 / 36 / 48 px (`--text-*` in `globals.css`); display headlines go larger on the landing page.
 
 ## Colour tokens and measured contrast (WCAG 2.2 AA)
 
 | Pair | Ratio |
 |---|---|
-| ink `#13233A` on canvas `#F6F4EF` | 14.4:1 |
-| ink-2 `#3A4757` on white | 9.5:1 |
-| ink-3 `#5A6574` on canvas / white | 5.4 / 5.9:1 |
-| brand-600 `#0F6E5C` on white / canvas | 6.2 / 5.6:1 |
-| white on brand-600 | 6.2:1 |
-| success / warning / danger / info text on their tints | 6.2 / 5.9 / 6.2 / 7.3:1 |
-| navy-200 on navy-800 (provider/admin sidebar) | 10.4:1 |
+| ink `#16201C` on canvas `#F4F1EA` | 14.8:1 |
+| ink-2 `#39443F` on surface `#FFFEFB` | 10.0:1 |
+| ink-3 `#58625D` on canvas / surface | 5.6 / 6.3:1 |
+| brand-600 `#0E6B52` on surface / canvas | 6.4 / 5.7:1 |
+| white on brand-600 / on ink | 6.5 / 16.7:1 |
+| clay-600 `#A8461F` on surface; clay-700 on clay-50 | 5.8 / 6.9:1 |
+| navy-200 / navy-300 on navy-900 (provider/admin sidebar) | 11.7 / 6.8:1 |
+| brand-200 on brand-800 (Health ID card) | 6.1:1 |
+
+The `navy-*` tokens keep their names for compatibility but are now a deep green-black, so the professional workspaces share the patient app's palette. Axe runs on 39 screens in the e2e suite and fails the build on any contrast regression.
 
 Status is never shown by colour alone. Every badge has text, and provenance badges also carry an icon.
 
@@ -36,7 +39,7 @@ Status is never shown by colour alone. Every badge has text, and provenance badg
 
 ## Components (`src/components`)
 
-- `ui/`: Button (variants: primary, secondary, ghost, danger, danger-outline, navy, link; with a loading state), Field/Input/Textarea/Select (label, hint and error wired automatically through context), Checkbox / CheckboxCard, RadioCards, Dialog, ConfirmDialog (reason and step-up built in), DropdownMenu, Badge, Callout, Card, Stat, Table, TabsNav (URL-driven), FilterBar (no-JS GET form), Pagination, EmptyState, Skeleton / PageSkeleton, Toaster (polite live region), PasswordInput, ActionButton, Icon.
+- `ui/`: Button (variants: primary, ink, secondary, ghost, danger, danger-outline, navy, link; with a loading state), Field/Input/Textarea/Select (label, hint and error wired automatically through context), Checkbox / CheckboxCard, RadioCards, Dialog, ConfirmDialog (reason and step-up built in), DropdownMenu, Badge, Callout, Card, Stat, Table, TabsNav (URL-driven), FilterBar (no-JS GET form), Pagination, EmptyState, Skeleton / PageSkeleton, Toaster (polite live region), PasswordInput, ActionButton, Icon.
 - `shell/`: one `AppShell` with three moods (patient light, provider/admin navy), MobileDrawer, BottomNav (patient, mobile), UserMenu, NotificationBell, SkipLink, SyntheticBanner.
 - `domain/`: RecordRow, ProvenanceBadge, CategoryIcon, HealthIdChip, ActivityItem, NotificationList, AccessGuard, FileDrop and upload with progress, StructuredData, Charts (with screen-reader figcaptions), SecuritySettings, IdentityForm.
 
