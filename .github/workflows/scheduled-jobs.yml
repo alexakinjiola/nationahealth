@@ -1,0 +1,33 @@
+# Runs the platform's background jobs every 15 minutes: expiry, SMS/email
+# reminders and message delivery. Vercel's Hobby plan only allows daily cron,
+# so this keeps medicine reminders on time.
+#
+# Set these in GitHub → Settings → Secrets and variables → Actions:
+#   APP_URL       e.g. https://nationahealthrecord.vercel.app   (variable or secret)
+#   CRON_SECRET   the same value as CRON_SECRET in Vercel       (secret)
+#   VERCEL_BYPASS optional: "Protection Bypass for Automation" secret, only
+#                 needed while Vercel Authentication protects the site.
+name: Scheduled jobs
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+permissions: {}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run background jobs
+        env:
+          APP_URL: ${{ vars.APP_URL || secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          VERCEL_BYPASS: ${{ secrets.VERCEL_BYPASS }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "APP_URL or CRON_SECRET not set; skipping."; exit 0
+          fi
+          extra=()
+          if [ -n "$VERCEL_BYPASS" ]; then extra=(-H "x-vercel-protection-bypass: $VERCEL_BYPASS"); fi
+          curl --fail-with-body -sS -X POST "$APP_URL/api/cron/all" \
+            -H "Authorization: Bearer $CRON_SECRET" "${extra[@]}" --max-time 60

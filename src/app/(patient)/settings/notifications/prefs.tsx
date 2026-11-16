@@ -25,7 +25,7 @@ export function Prefs({ initial }: { initial: Record<string, { in_app: boolean; 
   const set = (k: string, ch: "in_app" | "email", v: boolean) => setState((s) => ({ ...s, [k]: { ...s[k], [ch]: v } }));
   return (
     <div className="space-y-8">
-      <div className="overflow-x-auto">
+      <div role="region" aria-label="Notification preferences" tabIndex={0} className="overflow-x-auto">
         <table className="w-full text-sm">
           <caption className="sr-only">Optional notifications</caption>
           <thead><tr className="border-b border-line text-left text-xs text-ink-3"><th scope="col" className="py-2 font-medium">Notification</th><th scope="col" className="w-20 py-2 text-center font-medium">In app</th><th scope="col" className="w-20 py-2 text-center font-medium">Email</th></tr></thead>

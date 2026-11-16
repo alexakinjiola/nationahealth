@@ -6,6 +6,8 @@ import { requirePatientContext } from "@/lib/auth/actor";
 import { withActor } from "@/lib/db";
 import { signOutAction } from "../(auth)/actions";
 import { ActingForSwitcher } from "./acting-for";
+import { getT } from "@/lib/i18n/server";
+import { LanguageSwitcher } from "@/components/shell/language-switcher";
 
 export default async function PatientLayout({ children }: { children: React.ReactNode }) {
   const { actor, patientId, actingAs } = await requirePatientContext();
@@ -13,24 +15,28 @@ export default async function PatientLayout({ children }: { children: React.Reac
     select (select count(*)::int from access_requests where patient_id = ${patientId} and status = 'pending' and respond_by > now()) as pending,
            (select count(*)::int from notifications where user_id = ${actor.userId} and read_at is null) as unread`);
 
+  const t = await getT();
   const nav: NavItem[] = [
-    { href: "/dashboard", label: "Overview", icon: "home" },
-    { href: "/records", label: "My health records", icon: "folder_open" },
-    { href: "/timeline", label: "Health timeline", icon: "timeline" },
-    { href: "/health-profile", label: "Emergency profile", icon: "emergency_home" },
-    { href: "/immunisations", label: "Immunisations", icon: "vaccines" },
-    { href: "/access", label: "Access & sharing", icon: "shield_person", badge: c.pending },
-    { href: "/activity", label: "Activity history", icon: "history" },
-    { href: "/notifications", label: "Notifications", icon: "notifications", badge: c.unread },
-    { href: "/settings", label: "Profile & settings", icon: "settings" },
-    { href: "/support", label: "Help & support", icon: "support_agent" },
+    { href: "/dashboard", label: t("patient.overview"), icon: "home" },
+    { href: "/records", label: t("patient.records"), icon: "folder_open" },
+    { href: "/timeline", label: t("patient.timeline"), icon: "timeline" },
+    { href: "/health-profile", label: t("patient.emergency"), icon: "emergency_home" },
+    { href: "/immunisations", label: t("patient.immunisations"), icon: "vaccines" },
+    { href: "/access", label: t("patient.access"), icon: "shield_person", badge: c.pending },
+    { href: "/referrals", label: t("patient.referrals"), icon: "send" },
+    { href: "/maternity", label: t("patient.pregnancy"), icon: "pregnant_woman" },
+    { href: "/reminders", label: t("patient.reminders"), icon: "alarm" },
+    { href: "/activity", label: t("patient.activity"), icon: "history" },
+    { href: "/notifications", label: t("patient.notifications"), icon: "notifications", badge: c.unread },
+    { href: "/settings", label: t("patient.settings"), icon: "settings" },
+    { href: "/support", label: t("patient.help"), icon: "support_agent" },
   ];
   const bottom: NavItem[] = [
-    { href: "/dashboard", label: "Home", icon: "home" },
-    { href: "/records", label: "Records", icon: "folder_open" },
-    { href: "/access", label: "Access", icon: "shield_person", badge: c.pending },
-    { href: "/activity", label: "Activity", icon: "history" },
-    { href: "/settings", label: "Settings", icon: "settings" },
+    { href: "/dashboard", label: t("bottom.home"), icon: "home" },
+    { href: "/records", label: t("bottom.records"), icon: "folder_open" },
+    { href: "/access", label: t("bottom.access"), icon: "shield_person", badge: c.pending },
+    { href: "/activity", label: t("bottom.activity"), icon: "history" },
+    { href: "/settings", label: t("bottom.settings"), icon: "settings" },
   ];
   const others = [
     ...(actor.professional || actor.ownedInstitutionDrafts.length ? [{ href: "/provider", label: "Provider workspace", icon: "local_hospital" as const }] : []),
@@ -56,6 +62,7 @@ export default async function PatientLayout({ children }: { children: React.Reac
         </div>
       ) : null}
       topRight={<>
+        <LanguageSwitcher current={t.lang} label={t("nav.language")} className="hidden sm:inline-flex" />
         <NotificationBell count={c.unread} href="/notifications" />
         <UserMenu name={actor.displayName} email={actor.email} signOut={signOutAction}
           links={[{ href: "/settings", label: "Profile & settings", icon: "person" }, { href: "/settings/security", label: "Security", icon: "lock" }, ...others]} />

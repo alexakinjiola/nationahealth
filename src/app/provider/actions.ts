@@ -230,3 +230,40 @@ export async function setStaffRoleAction(affiliationId: string, v: { roleIds: st
     await withActor(actor.userId, (tx) => tx`select app.institution_set_staff_role(${uuid.parse(affiliationId)}, ${roleId})`, meta);
   }, "Role changed. They've been notified.");
 }
+
+// ── Referrals ────────────────────────────────────────────────────────────────
+const referralSchema = z.object({
+  patientId: z.string().uuid(),
+  toCode: z.string().trim().transform((s) => s.replace(/[^A-Za-z0-9]/g, "").toUpperCase())
+    .pipe(z.string().regex(/^(HOS|CLN|LAB|DXC|PHC|PHA)\d{9}$/, "Enter a valid Institution ID, e.g. HOS 4821 9375 2.")),
+  specialty: z.string().trim().max(120).optional().default(""),
+  urgency: z.enum(["routine", "urgent", "emergency"]),
+  reason: z.string().trim().min(10, "Give the reason in at least 10 characters.").max(1000),
+  summary: z.string().trim().max(4000).optional().default(""),
+  recordIds: z.array(z.string().uuid()).max(100).default([]),
+});
+
+export async function createReferralAction(input: unknown) {
+  return handle("create_referral", async () => {
+    const v = parse(referralSchema, input);
+    const { actor, inst, meta } = await current();
+    await withActor(actor.userId, (tx) => tx`select app.create_referral(${inst}, ${v.patientId}, ${v.toCode}, ${v.specialty}, ${v.reason},
+      ${v.summary}, ${v.urgency}::referral_urgency, ${v.recordIds}::uuid[])`, meta);
+  }, "Referral created. The patient has been asked to approve it.");
+}
+
+export async function respondReferralAction(referralId: string, status: "accepted" | "declined" | "completed", input: { reason: string; appointment?: string }) {
+  return handle("respond_referral", async () => {
+    const { actor, meta } = await current();
+    const appt = input.appointment ? new Date(input.appointment) : null;
+    await withActor(actor.userId, (tx) => tx`select app.institution_respond_referral(${uuid.parse(referralId)}, ${status}::referral_status,
+      ${input.reason || null}, ${appt && !isNaN(appt.getTime()) ? appt.toISOString() : null}::timestamptz)`, meta);
+  }, status === "accepted" ? "Referral accepted. The patient and referring clinician were told." : "Referral updated.");
+}
+
+export async function cancelReferralAction(referralId: string, input: { reason: string }) {
+  return handle("cancel_referral", async () => {
+    const { actor, meta } = await current();
+    await withActor(actor.userId, (tx) => tx`select app.cancel_referral(${uuid.parse(referralId)}, ${input.reason || null})`, meta);
+  }, "Referral cancelled.");
+}

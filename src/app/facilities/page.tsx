@@ -55,20 +55,20 @@ export default async function FacilitiesPage({ searchParams }: { searchParams: P
         </div>
 
         <form method="get" role="search" aria-label="Search facilities" className="sticky top-3 z-20 mt-8 grid gap-2 rounded-xl bg-surface p-2.5 shadow-lg ring-1 ring-line/70 md:grid-cols-[1.4fr_1fr_1fr_auto]">
-          <label className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-brand-50/60">
+          <label className="flex items-center gap-3 rounded-lg px-3 py-1.5 hover:bg-brand-50/60">
             <Icon name="search" size={22} className="text-brand-600" />
             <span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-ink-3">Name, town or Institution ID</span>
-              <input name="q" defaultValue={q ?? ""} placeholder="e.g. Ikeja or HOS 4821…" className="w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-placeholder" /></span>
+              <input name="q" defaultValue={q ?? ""} placeholder="e.g. Ikeja or HOS 4821…" className="h-9 w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-placeholder" /></span>
           </label>
-          <label className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-brand-50/60 md:border-l md:border-line">
+          <label className="flex items-center gap-3 rounded-lg px-3 py-1.5 hover:bg-brand-50/60 md:border-l md:border-line">
             <Icon name="location_on" size={22} className="text-brand-600" />
             <span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-ink-3">State</span>
-              <select name="state" defaultValue={state ?? ""} className="w-full bg-transparent text-[15px] text-ink outline-none"><option value="">All states</option>{NIGERIAN_STATES.map((s) => <option key={s}>{s}</option>)}</select></span>
+              <select name="state" defaultValue={state ?? ""} className="h-9 w-full bg-transparent text-[15px] text-ink outline-none"><option value="">All states</option>{NIGERIAN_STATES.map((s) => <option key={s}>{s}</option>)}</select></span>
           </label>
-          <label className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-brand-50/60 md:border-l md:border-line">
+          <label className="flex items-center gap-3 rounded-lg px-3 py-1.5 hover:bg-brand-50/60 md:border-l md:border-line">
             <Icon name="filter_alt" size={22} className="text-brand-600" />
             <span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-ink-3">Type</span>
-              <select name="type" defaultValue={type ?? ""} className="w-full bg-transparent text-[15px] text-ink outline-none"><option value="">All types</option>{Object.entries(INSTITUTION_TYPE).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></span>
+              <select name="type" defaultValue={type ?? ""} className="h-9 w-full bg-transparent text-[15px] text-ink outline-none"><option value="">All types</option>{Object.entries(INSTITUTION_TYPE).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></span>
           </label>
           <Button type="submit" size="lg" icon="search" className="m-1">Search</Button>
         </form>

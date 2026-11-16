@@ -21,7 +21,7 @@ export function Logo({ href = "/", inverted, suffix, className }: { href?: strin
       <LogoMark inverted={inverted} />
       <span className={cn("text-[18px] font-extrabold tracking-[-0.02em]", inverted ? "text-white" : "text-ink")}>{PLATFORM_NAME}</span>
       {suffix && (
-        <span className={cn("rounded-sm px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-[0.08em]",
+        <span className={cn("rounded-sm px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-[0.08em] max-[420px]:hidden",
           inverted ? "bg-white/10 text-navy-200" : "bg-sunken text-ink-3")}>{suffix}</span>
       )}
     </Link>

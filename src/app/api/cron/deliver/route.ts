@@ -1,11 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { db } from "@/lib/db";
-import { env } from "@/lib/env";
-import { safeEqual } from "@/lib/crypto";
-import { deliverDue, deliveryConfigFromEnv } from "@/lib/messaging/delivery";
+import { cronAuthorized, runDelivery } from "@/lib/jobs";
 
-/** Scheduled job: deliver queued emails/SMS. Call every minute with the cron secret. */
-export async function POST(req: NextRequest) {
-  if (!safeEqual(req.headers.get("authorization") ?? "", `Bearer ${env().CRON_SECRET}`)) return NextResponse.json({ ok: false }, { status: 401 });
-  return NextResponse.json({ ok: true, ...(await deliverDue(db(), deliveryConfigFromEnv())) });
+/** Scheduled job: deliver queued emails/SMS. GET is what Vercel Cron sends; POST for other schedulers. */
+async function handler(req: NextRequest) {
+  if (!cronAuthorized(req)) return NextResponse.json({ ok: false }, { status: 401 });
+  return NextResponse.json({ ok: true, ...(await runDelivery()) });
 }
+export { handler as GET, handler as POST };

@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stat } from "@/components/ui/stat";
 import { ProgressRing, Reveal } from "@/components/ui/motion";
 import { withActor } from "@/lib/db";
+import { getT } from "@/lib/i18n/server";
 import { requirePatientContext } from "@/lib/auth/actor";
 import { dashboardData } from "@/server/patient";
 import { Badge } from "@/components/ui/badge";
@@ -23,14 +24,15 @@ import { formatDate, relativeTime, daysUntil, plural } from "@/lib/format";
 export const metadata: Metadata = { title: "Overview" };
 
 
-function greeting() {
+function greetingKey() {
   const h = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hour12: false, timeZone: "Africa/Lagos" }).format(new Date()));
-  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  return h < 12 ? "dash.morning" : h < 17 ? "dash.afternoon" : "dash.evening";
 }
 
 export default async function DashboardPage() {
   const { actor, patientId, actingAs } = await requirePatientContext("/dashboard");
   const d = await dashboardData(actor.userId, patientId);
+  const t = await getT();
   const [hp] = await withActor(actor.userId, (tx) => tx<{ blood_group: string; genotype: string; allergies: string | null; chronic_conditions: string[]; nhia_number: string | null }[]>`
     select blood_group, genotype, allergies, chronic_conditions, nhia_number from patient_health_profiles where patient_id = ${patientId}`);
   const hpScore = Math.round(([hp?.blood_group && hp.blood_group !== "unknown", hp?.genotype && hp.genotype !== "unknown", !!hp?.allergies,
@@ -47,7 +49,7 @@ export default async function DashboardPage() {
           <div className="min-w-0">
             <p className="text-sm font-medium text-brand-100">{formatDate(new Date(), { weekday: "long", day: "numeric", month: "long" })}</p>
             <h1 className="mt-2 text-[2rem] font-bold leading-[1.15] tracking-[-0.025em] sm:text-[2.5rem]">
-              {actingAs ? `${firstName}'s health record` : <>{greeting()}, <span className="font-display font-normal italic text-accent-200">{firstName}</span></>}
+              {actingAs ? `${firstName}'s health record` : <>{t(greetingKey())}, <span className="font-display font-normal italic text-accent-200">{firstName}</span></>}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-white/15 px-3 text-xs font-semibold ring-1 ring-white/20">
@@ -58,8 +60,8 @@ export default async function DashboardPage() {
               )}
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild variant="secondary" className="border-transparent"><Link href="/records/upload"><Icon name="upload_file" size={20} />Upload a record</Link></Button>
-              <Button asChild variant="accent"><Link href="/access"><Icon name="shield_person" size={20} />Manage access</Link></Button>
+              <Button asChild variant="secondary" className="border-transparent"><Link href="/records/upload"><Icon name="upload_file" size={20} />{t("dash.upload")}</Link></Button>
+              <Button asChild variant="accent"><Link href="/access"><Icon name="shield_person" size={20} />{t("dash.manage")}</Link></Button>
             </div>
           </div>
           {d.profile.health_id && <HealthIdCard value={d.profile.health_id} name={d.profile.full_name} />}

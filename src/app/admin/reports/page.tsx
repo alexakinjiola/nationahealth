@@ -7,7 +7,8 @@ import { Card, CardBody, CardHeader, CardTitle, CardDescription } from "@/compon
 import { Button } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { CountUp, Reveal } from "@/components/ui/motion";
-import { Donut, Funnel, Gauge, MultiLine, PALETTE, Pyramid, StackedBars, TrendArea } from "@/components/domain/report-charts";
+import { Donut, Funnel, Gauge, MultiLine, Pyramid, StackedBars, TrendArea } from "@/components/domain/report-charts";
+import { PALETTE } from "@/lib/chart-palette";
 import { CATEGORY, INSTITUTION_TYPE, purposeLabel } from "@/lib/labels";
 import { formatDate } from "@/lib/format";
 import { formatInstitutionCode } from "@/lib/validation/common";
@@ -189,7 +190,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         </div>
         <Reveal><Card>
           <CardHeader><div><CardTitle>Condition hotspots by state</CardTitle><CardDescription>Darker cells mean more patients. “&lt;5” is a small group, hidden for privacy.</CardDescription></div></CardHeader>
-          <div className="overflow-x-auto">
+          <div role="region" aria-label="Condition hotspots by state" tabIndex={0} className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-[13px]">
               <caption className="sr-only">Patients with each priority condition, by state</caption>
               <thead><tr className="bg-canvas"><th scope="col" className="sticky left-0 bg-canvas px-4 py-2.5 font-semibold text-ink-2">State</th>
@@ -240,7 +241,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             )}</Card></Reveal>
         </div>
         <Reveal><Card><CardHeader><CardTitle>States at a glance</CardTitle></CardHeader>
-          <div className="overflow-x-auto">
+          <div role="region" aria-label="States at a glance" tabIndex={0} className="overflow-x-auto">
             <table className="w-full min-w-[560px] text-left text-sm">
               <caption className="sr-only">Patients, verified facilities and records by state</caption>
               <thead className="bg-canvas"><tr>{["State", "Patients", "Verified facilities", "Records"].map((h) => <th key={h} scope="col" className="px-5 py-2.5 font-semibold text-ink-2">{h}</th>)}</tr></thead>

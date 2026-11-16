@@ -1,5 +1,6 @@
 import "server-only";
 import { unstable_rethrow } from "next/navigation";
+import { after } from "next/server";
 import type { z } from "zod";
 import { AppError, toAppError } from "./errors";
 import { log } from "./log";
@@ -30,6 +31,8 @@ export function parse<S extends z.ZodType>(schema: S, input: unknown): z.infer<S
 export async function handle<T>(name: string, fn: () => Promise<T>, message?: string): Promise<ActionResult<T>> {
   try {
     const data = await fn();
+    // Most actions queue an email, SMS or notification; send it straight away.
+    try { after(async () => (await import("./jobs")).kickDelivery()); } catch { /* outside a request (tests) */ }
     return { ok: true, data, message };
   } catch (err) {
     unstable_rethrow(err);

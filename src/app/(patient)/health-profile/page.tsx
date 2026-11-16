@@ -73,7 +73,7 @@ export default async function HealthProfilePage() {
                 <div><dt className="inline font-semibold">Conditions: </dt><dd className="inline text-white/90">{hp?.chronic_conditions.join(", ") || "None recorded"}</dd></div>
                 {hp?.current_medications && <div><dt className="inline font-semibold">Medicines: </dt><dd className="inline text-white/90">{hp.current_medications}</dd></div>}
                 <div><dt className="inline font-semibold">Emergency contact: </dt><dd className="inline text-white/90">{p.emergency_contact_name ? `${p.emergency_contact_name}${p.emergency_contact_relationship ? ` (${p.emergency_contact_relationship})` : ""} · ${p.emergency_contact_phone ?? ""}` : "Add one in Profile & settings"}</dd></div>
-                {hp?.organ_donor && <div className="flex items-center gap-1.5 pt-1 font-semibold"><Icon name="volunteer_activism" size={18} />Registered organ donor</div>}
+                {hp?.organ_donor && <div className="flex items-center gap-1.5 pt-1 font-semibold"><dt className="flex items-center gap-1.5"><Icon name="volunteer_activism" size={18} />Organ donor</dt><dd className="font-normal text-white/90">Registered</dd></div>}
               </dl>
             </div>
           ) : (

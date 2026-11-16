@@ -233,3 +233,106 @@ export async function saveHealthProfileAction(input: unknown) {
       ${v.conditions}, ${v.medications}, ${v.nhiaNumber}, ${v.hmoName}, ${v.organDonor}, ${v.pregnant ?? null}, ${v.disabilities}, ${v.shareInEmergency})`, await requestMeta());
   }, "Emergency profile saved.");
 }
+
+// ── Referrals ────────────────────────────────────────────────────────────────
+export async function decideReferralAction(referralId: string, approve: boolean, input: { reason: string; credential: string }) {
+  return handle("decide_referral", async () => {
+    const { actor } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`select app.patient_decide_referral(${uuid.parse(referralId)}, ${approve}, 30)`, await requestMeta());
+    void input;
+  }, approve ? "Referral approved. The receiving facility can now see the records you agreed to." : "Referral declined. Nothing was shared.");
+}
+
+// ── Maternal health ─────────────────────────────────────────────────────────
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose a date.");
+const optNum = (min: number, max: number) => z.union([z.literal(""), z.coerce.number().min(min).max(max)]).optional().transform((v) => (v === "" || v === undefined ? null : v));
+
+export async function startPregnancyAction(input: unknown) {
+  return handle("start_pregnancy", async () => {
+    const v = parse(z.object({ lmp: isoDate, gravida: optNum(1, 20), parity: optNum(0, 20), facility: z.string().max(200).default(""), notes: z.string().max(1000).default("") }), input);
+    const { actor, patientId } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`select app.start_pregnancy(${patientId}, ${v.lmp}::date, ${v.gravida}::smallint, ${v.parity}::smallint, ${v.facility}, ${v.notes})`, await requestMeta());
+  }, "Pregnancy tracking started. Congratulations.");
+}
+
+export async function addAntenatalVisitAction(pregnancyId: string, input: unknown) {
+  return handle("anc_visit", async () => {
+    const v = parse(z.object({
+      visitDate: isoDate, systolic: optNum(60, 260), diastolic: optNum(30, 180), weight: optNum(25, 250), hb: optNum(3, 20),
+      fundal: optNum(5, 50), notes: z.string().max(1000).default(""), nextVisit: z.union([z.literal(""), isoDate]).default(""),
+    }), input);
+    const { actor } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`select app.add_antenatal_visit(${uuid.parse(pregnancyId)}, ${v.visitDate}::date, ${v.systolic}::smallint,
+      ${v.diastolic}::smallint, ${v.weight}::numeric, ${v.hb}::numeric, ${v.fundal}::smallint, ${v.notes}, ${v.nextVisit || null}::date)`, await requestMeta());
+  }, "Visit saved.");
+}
+
+export async function endPregnancyAction(pregnancyId: string, status: "delivered" | "ended", input: { reason: string }) {
+  return handle("end_pregnancy", async () => {
+    const { actor } = await requirePatientContext();
+    void input;
+    await withActor(actor.userId, (tx) => tx`select app.end_pregnancy(${uuid.parse(pregnancyId)}, ${status}, current_date)`, await requestMeta());
+  }, status === "delivered" ? "Congratulations on your baby. Remember to start their immunisations." : "Pregnancy tracking ended.");
+}
+
+// ── Reminders ───────────────────────────────────────────────────────────────
+const reminderSchema = z.object({
+  id: z.string().uuid().nullable().optional(),
+  kind: z.enum(["medication", "appointment", "immunisation", "custom"]),
+  title: z.string().trim().min(2, "Give the reminder a name.").max(120),
+  times: z.array(z.string().regex(/^([01]\d|2[0-3]):(00|15|30|45)$/)).max(6).default([]),
+  startsOn: z.union([z.literal(""), isoDate]).default(""),
+  endsOn: z.union([z.literal(""), isoDate]).default(""),
+  appointmentAt: z.string().default(""),
+  beforeHours: z.coerce.number().int().min(1).max(168).default(24),
+  channel: z.enum(["sms", "email"]).default("sms"),
+  includeDetails: z.boolean().default(false),
+});
+
+export async function saveReminderAction(input: unknown) {
+  return handle("save_reminder", async () => {
+    const v = parse(reminderSchema, input);
+    // datetime-local values are Lagos local time.
+    const appt = v.appointmentAt ? new Date(`${v.appointmentAt}:00+01:00`) : null;
+    const { actor, patientId } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`select app.save_reminder(${patientId}, ${v.id ?? null}, ${v.kind}, ${v.title}, ${v.times}::text[],
+      ${v.startsOn || null}::date, ${v.endsOn || null}::date, ${appt && !isNaN(appt.getTime()) ? appt.toISOString() : null}::timestamptz,
+      ${v.beforeHours}::smallint, ${v.channel}, ${v.includeDetails}, true)`, await requestMeta());
+  }, "Reminder saved.");
+}
+
+export async function deleteReminderAction(reminderId: string) {
+  return handle("delete_reminder", async () => {
+    const { actor, patientId } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`select app.delete_reminder(${patientId}, ${uuid.parse(reminderId)})`, await requestMeta());
+  }, "Reminder deleted.");
+}
+
+export async function setSmsRemindersAction(enabled: boolean) {
+  return handle("sms_reminders", async () => {
+    const { actor, patientId } = await requirePatientContext();
+    await withActor(actor.userId, (tx) => tx`update patient_profiles set sms_reminders_enabled = ${enabled} where patient_id = ${patientId}`, await requestMeta());
+  }, enabled ? "SMS reminders turned on." : "SMS reminders paused.");
+}
+
+// ── Phone (USSD/SMS) access ────────────────────────────────────────────────
+export async function setPhonePinAction(input: unknown) {
+  return handle("phone_pin", async () => {
+    const v = parse(z.object({
+      pin: z.string().regex(/^\d{4,6}$/, "Use 4 to 6 digits."),
+      confirm: z.string(),
+      credential: z.string().optional().default(""),
+    }).refine((x) => x.pin === x.confirm, { path: ["confirm"], message: "The two PINs don't match." })
+      .refine((x) => !/^(\d)\1+$/.test(x.pin) && !["1234", "12345", "123456", "0000"].includes(x.pin), { path: ["pin"], message: "Choose a PIN that's harder to guess." }), input);
+    const { actor, patientId } = await requirePatientContext();
+    if (!hasRecentReauth(actor)) {
+      if (!v.credential) throw new AppError(401, "Enter your password to confirm it's you.");
+      await stepUp(actor, v.credential);
+    }
+    const { setPhonePin } = await import("@/lib/phone-access");
+    await setPhonePin(patientId, v.pin);
+    const { withService } = await import("@/lib/db");
+    await withService((tx) => tx`insert into audit_logs(actor_user_id, actor_type, action, entity_type, entity_id, patient_id, metadata)
+      values (${actor.userId}, 'user', 'phone_access.pin_set', 'patient', ${patientId}, ${patientId}, '{}'::jsonb)`);
+  }, "Phone PIN saved. You can now use your record by USSD and SMS.");
+}
