@@ -35,7 +35,7 @@ export default async function InstitutionsPage({ searchParams }: { searchParams:
       <Card className="mt-5">
         {rows.length === 0 ? <EmptyState icon="domain" title="Nothing here" /> : (
           <Table caption="Institutions">
-            <THead><tr><Th>Institution</Th><Th>Location</Th><Th>Status</Th><Th>Submitted</Th><Th>Evidence</Th><Th><span className="sr-only">Review</span></Th></tr></THead>
+            <THead><tr><Th className="min-w-56">Institution</Th><Th>Location</Th><Th>Status</Th><Th>Submitted</Th><Th>Evidence</Th><Th><span className="sr-only">Review</span></Th></tr></THead>
             <TBody>{rows.map((i) => (
               <Tr key={i.id}>
                 <Td><p className="font-medium text-ink">{i.name}</p><p className="text-xs text-ink-3"><span className="font-mono">{formatInstitutionCode(i.institution_code)}</span> · {INSTITUTION_TYPE[i.institution_type]}{i.is_synthetic && " · synthetic"}</p></Td>

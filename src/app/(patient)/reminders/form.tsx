@@ -6,7 +6,6 @@ import { Field, Input, Select } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { CheckboxCard } from "@/components/ui/checkbox";
 import { FormError } from "@/components/ui/form-error";
-import { Icon } from "@/components/ui/icon";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { saveReminderAction, setSmsRemindersAction } from "../actions";
@@ -98,10 +97,10 @@ export function SmsToggle({ enabled }: { enabled: boolean }) {
     <button type="button" role="switch" aria-checked={enabled} disabled={pending} onClick={() => start(async () => {
       const res = await setSmsRemindersAction(!enabled); if (res.ok) { toast.success(res.message!); router.refresh(); } })}
       className="inline-flex items-center gap-3 rounded-full border border-line-strong bg-surface py-1.5 pl-1.5 pr-4 text-sm font-semibold text-ink transition-colors hover:border-brand-300">
-      <span className={cn("relative h-6 w-11 rounded-full transition-colors", enabled ? "bg-accent-600" : "bg-line-strong")}>
-        <span className={cn("absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform", enabled ? "translate-x-[22px]" : "translate-x-0.5")} />
+      <span aria-hidden className={cn("relative h-6 w-11 shrink-0 rounded-full transition-colors", enabled ? "bg-accent-600" : "bg-line-strong")}>
+        <span className={cn("absolute left-0 top-0.5 size-5 rounded-full bg-white shadow transition-transform", enabled ? "translate-x-[22px]" : "translate-x-0.5")} />
       </span>
-      <Icon name="sms" size={18} />SMS reminders {enabled ? "on" : "paused"}
+      SMS reminders {enabled ? "on" : "paused"}
     </button>
   );
 }

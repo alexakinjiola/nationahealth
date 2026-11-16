@@ -46,7 +46,7 @@ export default async function FacilitiesPage({ searchParams }: { searchParams: P
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {[["domain", "Verified facilities", total], ["map", "States covered", statesCovered], ["science", "Laboratories & diagnostics", byType.filter((b) => ["laboratory", "diagnostic_centre"].includes(b.t)).reduce((a, b) => a + b.n, 0)]].map(([icon, label, n], i) => (
+          {[["domain", total === 1 ? "Verified facility" : "Verified facilities", total], ["map", statesCovered === 1 ? "State covered" : "States covered", statesCovered], ["science", "Laboratories & diagnostics", byType.filter((b) => ["laboratory", "diagnostic_centre"].includes(b.t)).reduce((a, b) => a + b.n, 0)]].map(([icon, label, n], i) => (
             <Reveal key={label as string} delay={i * 80}><div className="card flex items-center gap-4 p-5">
               <span className="grid size-12 place-items-center rounded-full bg-brand-50 text-brand-600"><Icon name={icon as IconName} size={24} /></span>
               <div><p className="text-3xl font-bold text-ink"><CountUp value={n as number} /></p><p className="text-sm text-ink-3">{label}</p></div>

@@ -89,7 +89,7 @@ export default async function ProviderPatient({ params }: { params: Promise<{ pa
           <span className="grid size-14 shrink-0 place-items-center rounded-full bg-navy-800 text-lg font-semibold text-white">{p.full_name.split(" ").map((s: string) => s[0]).slice(0, 2).join("")}</span>
           <div className="flex-1">
             <h1 className="text-2xl font-semibold tracking-[-0.015em] text-ink">{p.full_name}</h1>
-            <p className="mt-1 text-sm text-ink-3">{age(p.date_of_birth)} years · born {formatDate(p.date_of_birth)} · {p.sex} · <span className="font-mono">{formatHealthId(p.health_id)}</span></p>
+            <p className="mt-1 text-sm text-ink-3">{age(p.date_of_birth)} years · born {formatDate(p.date_of_birth)} · {p.sex} · <span className="whitespace-nowrap font-mono">{formatHealthId(p.health_id)}</span></p>
           </div>
           <div className="flex flex-wrap gap-2">
             {can("records:submit") && <Button asChild variant="secondary" icon="upload_file"><Link href={`/provider/submit?patient=${patientId}`}>Add a record</Link></Button>}

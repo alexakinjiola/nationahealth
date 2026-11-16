@@ -43,7 +43,7 @@ export default async function RecordsPage({ searchParams }: { searchParams: Prom
         description="Everything on your record, with where it came from. Uploads you added yourself are labelled so no one mistakes them for verified clinical records."
         actions={<><Button asChild variant="secondary" icon="download"><Link href="/records/export">Export</Link></Button><Button asChild icon="upload_file"><Link href="/records/upload">Upload a record</Link></Button></>}
       />
-      <nav aria-label="Record categories" className="-mx-1 mb-5 overflow-x-auto pb-1">
+      <nav aria-label="Record categories" className="edge-fade -mx-1 mb-5 overflow-x-auto pb-1 max-sm:pr-8">
         <ul className="flex min-w-max gap-2 px-1">
           <li><Link href={qs({ category: undefined, page: undefined })} aria-current={!f.category ? "page" : undefined}
             className={cn("inline-flex h-9 items-center rounded-full border px-3.5 text-sm font-medium", !f.category ? "border-navy-800 bg-navy-800 text-white" : "border-line bg-surface text-ink-2 hover:border-line-strong")}>All</Link></li>

@@ -104,7 +104,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           <Button asChild variant="secondary" icon="download"><a href={`/api/admin/report?days=${days}`}>Download CSV</a></Button>
         </>} />
 
-      <nav aria-label="Report sections" className="sticky top-16 z-10 -mx-1 flex gap-1.5 overflow-x-auto rounded-full border border-line/80 bg-surface/90 p-1.5 shadow-card backdrop-blur">
+      <nav aria-label="Report sections" className="edge-fade sticky top-16 z-10 -mx-1 flex gap-1.5 overflow-x-auto max-sm:pr-8 rounded-full border border-line/80 bg-surface/90 p-1.5 shadow-card backdrop-blur">
         {[["overview", "Overview"], ["growth", "Growth"], ["records", "Records"], ["access", "Consent & access"], ["health", "Public health"], ["network", "Facilities"]].map(([id, l]) => (
           <a key={id} href={`#${id}`} className="whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-semibold text-ink-3 transition-colors hover:bg-brand-50 hover:text-brand-700">{l}</a>
         ))}
@@ -190,7 +190,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         </div>
         <Reveal><Card>
           <CardHeader><div><CardTitle>Condition hotspots by state</CardTitle><CardDescription>Darker cells mean more patients. “&lt;5” is a small group, hidden for privacy.</CardDescription></div></CardHeader>
-          <div role="region" aria-label="Condition hotspots by state" tabIndex={0} className="overflow-x-auto">
+          <div role="region" aria-label="Condition hotspots by state" tabIndex={0} className="scroll-shadow overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-[13px]">
               <caption className="sr-only">Patients with each priority condition, by state</caption>
               <thead><tr className="bg-canvas"><th scope="col" className="sticky left-0 bg-canvas px-4 py-2.5 font-semibold text-ink-2">State</th>
@@ -241,7 +241,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             )}</Card></Reveal>
         </div>
         <Reveal><Card><CardHeader><CardTitle>States at a glance</CardTitle></CardHeader>
-          <div role="region" aria-label="States at a glance" tabIndex={0} className="overflow-x-auto">
+          <div role="region" aria-label="States at a glance" tabIndex={0} className="scroll-shadow overflow-x-auto">
             <table className="w-full min-w-[560px] text-left text-sm">
               <caption className="sr-only">Patients, verified facilities and records by state</caption>
               <thead className="bg-canvas"><tr>{["State", "Patients", "Verified facilities", "Records"].map((h) => <th key={h} scope="col" className="px-5 py-2.5 font-semibold text-ink-2">{h}</th>)}</tr></thead>

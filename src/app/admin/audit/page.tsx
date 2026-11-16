@@ -40,7 +40,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
               <Td className="text-ink">{r.actor_user_id ? name[r.actor_user_id] ?? "User" : "System"}{r.ip && <p className="font-mono text-xs text-ink-3">{r.ip}</p>}</Td>
               <Td className="font-mono text-xs text-ink">{r.action}</Td>
               <Td className="text-xs text-ink-3">{r.entity_type}<br /><span className="font-mono">{String(r.entity_id ?? "").slice(0, 12)}</span></Td>
-              <Td className="max-w-72 font-mono text-[11px] leading-4 text-ink-3 break-all">{JSON.stringify(r.metadata)}</Td>
+              <Td className="max-w-80 text-xs text-ink-3"><MetadataList data={r.metadata} /></Td>
               <Td className="font-mono text-[11px] text-ink-3">{r.hash.slice(0, 10)}…</Td>
             </Tr>
           ))}</TBody>
@@ -49,3 +49,28 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
     </div>
   );
 }
+
+/** Audit metadata as a short, readable list instead of a raw JSON blob. */
+function MetadataList({ data }: { data: Record<string, unknown> | null }) {
+  const entries = Object.entries(data ?? {});
+  if (!entries.length) return <span aria-label="No details">—</span>;
+  const show = (v: unknown) => {
+    if (v === null || v === undefined) return "—";
+    if (Array.isArray(v)) return v.map((x) => (typeof x === "object" ? JSON.stringify(x) : String(x))).join(", ");
+    if (typeof v === "object") return JSON.stringify(v);
+    const s = String(v);
+    return /^\d{4}-\d{2}-\d{2}T/.test(s) ? new Date(s).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : s;
+  };
+  return (
+    <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5">
+      {entries.slice(0, 6).map(([k, v]) => (
+        <div key={k} className="contents">
+          <dt className="font-medium text-ink-2">{k.replace(/_/g, " ")}</dt>
+          <dd className="min-w-0 break-words [overflow-wrap:anywhere]">{show(v)}</dd>
+        </div>
+      ))}
+      {entries.length > 6 && <><dt className="sr-only">More</dt><dd className="col-span-2 text-ink-3">+{entries.length - 6} more</dd></>}
+    </dl>
+  );
+}
+

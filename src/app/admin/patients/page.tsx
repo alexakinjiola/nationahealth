@@ -12,6 +12,7 @@ import { FilterBar, FilterField, filterControl } from "@/components/ui/filter-ba
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui/table";
 import { VERIFICATION } from "@/lib/labels";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { formatHealthId } from "@/lib/validation/common";
 import { AdminAction } from "../confirm";
 import { decideIdentityAction, setRepresentativeAction, setUserStatusAction } from "../actions";
 
@@ -81,7 +82,7 @@ export default async function PatientsAdmin({ searchParams }: { searchParams: Pr
             <TBody>{d.patients.map((p) => (
               <Tr key={p.patient_id}>
                 <Td><p className="font-medium text-ink">{p.full_name}{p.is_synthetic && <span className="text-xs text-ink-3"> · synthetic</span>}</p><p className="text-xs text-ink-3">{p.email} · {p.phone}</p></Td>
-                <Td className="font-mono text-xs text-ink-2">{p.health_id}</Td>
+                <Td className="whitespace-nowrap font-mono text-xs text-ink-2">{formatHealthId(p.health_id)}</Td>
                 <Td><Badge tone={VERIFICATION[p.verification_status]?.tone}>{VERIFICATION[p.verification_status]?.label}</Badge></Td>
                 <Td><Badge tone={p.account_status === "active" ? "success" : "danger"}>{p.account_status}</Badge></Td>
                 <Td className="text-ink-3">{p.last_login_at ? formatDateTime(p.last_login_at) : "Never"}</Td>

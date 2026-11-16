@@ -50,7 +50,7 @@ export function HealthProfileForm({ initial, sex }: { initial: HealthProfile | n
             {BLOOD_GROUPS.map((b) => (
               <button key={b} type="button" role="radio" aria-checked={v.bloodGroup === b} onClick={() => set("bloodGroup", b)}
                 className={cn("h-11 min-w-14 rounded-full border px-4 text-sm font-bold transition-all",
-                  v.bloodGroup === b ? "scale-105 border-danger-600 bg-danger-600 text-white shadow-md" : "border-line-strong bg-surface text-ink hover:border-danger-600/50")}>
+                  v.bloodGroup === b ? "scale-105 border-brand-600 bg-brand-600 text-white shadow-md" : "border-line-strong bg-surface text-ink hover:border-brand-300")}>
                 {b === "unknown" ? "Don't know" : b}
               </button>
             ))}

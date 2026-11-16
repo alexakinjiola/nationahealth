@@ -30,7 +30,7 @@ export function ProfileForm({ initial }: { initial: V }) {
       <fieldset className="grid gap-5 sm:grid-cols-2">
         <legend className="mb-4 text-sm font-semibold text-ink">Contact & address</legend>
         <Field label="Phone number" error={e.phone?.message} optional><Input type="tel" autoComplete="tel" {...form.register("phone")} /></Field>
-        <Field label="Preferred language" hint="For future translated content.">
+        <Field label="Preferred language" hint="Used for text messages, USSD and this app. You can also switch at the top of any page.">
           <Select {...form.register("preferredLanguage")}>
             <option value="en">English</option><option value="pcm">Nigerian Pidgin</option><option value="yo">Yorùbá</option><option value="ig">Igbo</option><option value="ha">Hausa</option>
           </Select>
