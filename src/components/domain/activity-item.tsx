@@ -20,6 +20,14 @@ const ACTION_TEXT: Record<string, string> = {
   "permission.emergency_access": "Emergency access opened", "permission.suspended": "Access paused",
   "record.uploaded_by_patient": "You uploaded a document", "record.correction_requested": "You raised a query on a record",
   "record.marked_in_error": "You marked an upload as an error",
+  record_summary_pdf: "You downloaded a summary of your records (PDF)",
+  structured_bundle: "You exported your records as structured data (FHIR)",
+};
+
+/** Unknown codes still read like a sentence rather than raw identifiers. */
+const humanise = (code: string) => {
+  const t = code.replace(/[._]/g, " ").trim();
+  return t.charAt(0).toUpperCase() + t.slice(1);
 };
 
 const KIND: Record<string, { icon: IconName; tone: string }> = {
@@ -37,7 +45,7 @@ const KIND: Record<string, { icon: IconName; tone: string }> = {
 };
 
 export function describeActivity(a: ActivityRow) {
-  const verb = ACTION_TEXT[a.action] ?? a.action.replace(/[._]/g, " ");
+  const verb = ACTION_TEXT[a.action] ?? humanise(a.action);
   if (a.kind === "blocked") return `${a.institution_name ?? "Someone"} tried to access your information and was blocked`;
   if (["viewed", "downloaded", "submitted", "emergency", "lookup"].includes(a.kind) || a.action === "access_request.created" || a.action === "access_request.cancelled") {
     const who = a.actor_name ? `${a.actor_name}${a.institution_name ? ` at ${a.institution_name}` : ""}` : (a.institution_name ?? "An institution");
@@ -53,7 +61,7 @@ export function ActivityItem({ a, action, compact }: { a: ActivityRow; action?: 
       <span className={cn("grid size-10 shrink-0 place-items-center rounded-full", k.tone)}><Icon name={k.icon} size={18} /></span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium leading-6 text-ink">{describeActivity(a)}</p>
-        <p className="text-[13px] text-ink-3">
+        <p className="line-clamp-2 text-[13px] text-ink-3">
           <time dateTime={a.occurred_at}>{formatDateTime(a.occurred_at)}</time>
           {a.record_title ? ` · ${a.record_title}` : a.category_key ? ` · ${categoryLabel(a.category_key)}` : ""}
         </p>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui/table";
 import { BASIS, CATEGORY, PURPOSE } from "@/lib/labels";
+import { formatHealthId } from "@/lib/validation/common";
 import { age, daysUntil, formatDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Authorised patients" };
@@ -31,7 +32,7 @@ export default async function PatientsPage() {
             <THead><tr><Th>Patient</Th><Th>Scope</Th><Th>Basis</Th><Th>Ends</Th><Th><span className="sr-only">Open</span></Th></tr></THead>
             <TBody>{rows.map((r) => (
               <Tr key={r.permission_id}>
-                <Td><p className="font-semibold text-ink">{r.full_name}</p><p className="text-xs text-ink-3">{age(r.date_of_birth)} yrs · <span className="font-mono">{r.health_id}</span></p></Td>
+                <Td><p className="font-semibold text-ink">{r.full_name}</p><p className="text-xs text-ink-3">{age(r.date_of_birth)} yrs · <span className="whitespace-nowrap font-mono">{formatHealthId(r.health_id)}</span></p></Td>
                 <Td className="max-w-72"><p className="text-ink">{PURPOSE[r.purpose]?.label}</p><p className="text-xs text-ink-3">{(r.categories as string[]).map((c) => CATEGORY[c]?.label).join(", ")}</p>
                   {r.restricted && <Badge tone="info" className="mt-1">Named professional only</Badge>}</Td>
                 <Td>{r.basis === "emergency_access" ? <Badge tone="danger" icon="emergency">Emergency</Badge> : <span className="text-ink-2">{BASIS[r.basis]}</span>}</Td>

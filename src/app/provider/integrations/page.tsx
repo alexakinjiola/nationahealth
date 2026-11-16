@@ -41,7 +41,7 @@ export default async function IntegrationsPage() {
         ))}</ul>
       )}</Card>
       <Card><CardHeader><CardTitle>How to send records</CardTitle></CardHeader><CardBody className="space-y-3 text-sm text-ink-2">
-        <p>POST a FHIR R4 <code className="font-mono">Bundle</code> to <code className="font-mono">{env().APP_URL}/api/v1/fhir/Bundle</code> with <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>.</p>
+        <p>POST a FHIR R4 <code className="font-mono">Bundle</code> to <code className="break-all font-mono">{env().APP_URL}/api/v1/fhir/Bundle</code> with <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>.</p>
         <p>Include a <code className="font-mono">Patient</code> resource whose identifier is the patient's platform Health ID. Supported resources: Observation, DiagnosticReport, Condition, MedicationRequest, MedicationStatement, AllergyIntolerance, Immunization, Procedure, Encounter, DocumentReference, Composition.</p>
         <p>Re-sending a resource with the same id is ignored, so retries are safe. Only identity-verified patients can be matched, and every record is labelled as received through an approved integration.</p>
       </CardBody></Card>

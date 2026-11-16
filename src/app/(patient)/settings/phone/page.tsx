@@ -42,7 +42,7 @@ export default async function PhoneAccessPage() {
         <div className="space-y-6">
           <div className="rounded-lg bg-gradient-to-br from-navy-900 to-brand-700 p-6 text-white shadow-lg">
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-brand-100"><Icon name="dialpad" size={16} />USSD menu</p>
-            <p className="mt-3 font-mono text-3xl font-bold">{code ?? "*000*000#"}</p>
+            {code ? <p className="mt-3 font-mono text-3xl font-bold">{code}</p> : <p className="mt-3 text-lg font-semibold">Short code coming soon</p>}
             <ol className="mt-4 space-y-1.5 font-mono text-sm text-white/90">
               <li>1. Health ID & emergency info</li><li>2. Approve or decline access requests</li><li>3. Recent activity</li><li>4. My reminders</li><li>5. Language</li>
             </ol>

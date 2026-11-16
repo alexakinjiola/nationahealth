@@ -1,11 +1,15 @@
 import * as React from "react";
 import { cn } from "@/lib/cn";
 
-export function Table({ className, caption, children }: { className?: string; caption: string; children: React.ReactNode }) {
+/**
+ * Wide tables keep a readable minimum width and scroll sideways on phones,
+ * with soft edge shadows that show there's more to see.
+ */
+export function Table({ className, caption, children, minWidth = "min-w-[40rem]" }: { className?: string; caption: string; children: React.ReactNode; minWidth?: string }) {
   return (
     // Keyboard users can scroll wide tables: the region is focusable and named.
-    <div role="region" aria-label={caption} tabIndex={0} className={cn("overflow-x-auto focus-visible:outline-offset-[-2px]", className)}>
-      <table className="w-full border-collapse text-left text-sm">
+    <div role="region" aria-label={caption} tabIndex={0} className={cn("scroll-shadow overflow-x-auto focus-visible:outline-offset-[-2px]", className)}>
+      <table className={cn("w-full border-collapse text-left text-sm", minWidth)}>
         <caption className="sr-only">{caption}</caption>
         {children}
       </table>

@@ -66,7 +66,7 @@ export default async function ReferralsPage({ searchParams }: { searchParams: Pr
                       <span className="inline-flex items-center gap-1"><Icon name="person" size={16} />{r.referrer}</span>
                       <span className="inline-flex items-center gap-1"><Icon name="attach_file" size={16} />{r.record_count} record{r.record_count === 1 ? "" : "s"} attached</span>
                       <span className="inline-flex items-center gap-1"><Icon name="schedule" size={16} />{relativeTime(r.created_at)}</span>
-                      {r.health_id && r.status !== "awaiting_patient" && <span className="font-mono">{formatHealthId(r.health_id)}</span>}
+                      {r.health_id && r.status !== "awaiting_patient" && <span className="whitespace-nowrap font-mono">{formatHealthId(r.health_id)}</span>}
                       {r.appointment_at && <span className="inline-flex items-center gap-1 font-semibold text-accent-700"><Icon name="event" size={16} />Appointment {formatDateTime(r.appointment_at)}</span>}
                     </p>
                     {r.response_note && <p className="mt-2 rounded-md bg-sunken px-3 py-2 text-sm text-ink-2">“{r.response_note}”</p>}

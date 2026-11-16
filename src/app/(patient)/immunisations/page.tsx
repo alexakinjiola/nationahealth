@@ -17,7 +17,7 @@ import { ReminderDialog } from "../reminders/form";
 export const metadata: Metadata = { title: "Immunisations" };
 
 const WEEK = 7 * 86_400_000;
-const ageLabel = (w: number) => (w === 0 ? "At birth" : w < 52 ? `${w} weeks` : w < 104 ? `${Math.round(w / 4.345)} months` : `${Math.round(w / 52)} years`);
+const ageLabel = (w: number) => (w === 0 ? "At birth" : w < 52 ? `${w} weeks` : w < 104 ? `${Math.round(w / 4.345)} months` : `${Math.floor(w / 52)} years`);
 
 export default async function ImmunisationsPage() {
   const { actor, patientId, actingAs } = await requirePatientContext("/immunisations");

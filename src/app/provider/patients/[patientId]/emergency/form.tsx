@@ -38,7 +38,7 @@ export function EmergencyForm({ patientId, allowed, hours }: { patientId: string
         <label htmlFor="attest" className="text-sm leading-6 text-ink-2">I declare this is a genuine emergency, the information is needed now for this patient's care, and I understand this access will be reviewed and the patient notified. Misuse may lead to suspension.</label>
       </div>
       <FormError message={error} />
-      <Button type="submit" variant="danger" size="lg" icon="emergency" loading={pending}>Open emergency access for {hours} hours</Button>
+      <Button type="submit" variant="danger" size="lg" icon="emergency" loading={pending} className="w-full sm:w-auto">Open emergency access for {hours} hours</Button>
     </form>
   );
 }

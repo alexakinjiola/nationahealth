@@ -171,3 +171,19 @@
   .no-print { display: none !important; }
   body { background: white; }
 }
+
+/* Scrollable regions: shadows appear only on the side that has more content. */
+@utility scroll-shadow {
+  background:
+    linear-gradient(to right, var(--color-surface) 30%, rgb(255 255 255 / 0)) left / 40px 100% no-repeat local,
+    linear-gradient(to left, var(--color-surface) 30%, rgb(255 255 255 / 0)) right / 40px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgb(11 37 89 / 0.16), transparent) left / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(11 37 89 / 0.16), transparent) right / 14px 100% no-repeat scroll;
+}
+/* Horizontal pill bars on phones: fade the trailing edge so it reads as scrollable. */
+@utility edge-fade {
+  @media (width < 40rem) {
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+}
+
