@@ -145,6 +145,10 @@
   p { text-wrap: pretty; }
 
   [hidden] { display: none !important; }
+
+  /* Scroll containers are the positioning context for their content, so
+     visually hidden (sr-only) labels inside wide tables can't widen the page. */
+  .overflow-x-auto, .overflow-auto, .overflow-y-auto { position: relative; }
 }
 
 @layer components {

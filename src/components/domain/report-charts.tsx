@@ -7,7 +7,8 @@ import {
 import { useReducedMotion } from "@/components/ui/motion";
 
 /** Brand-led categorical palette, distinguishable and readable on white. */
-export const PALETTE = ["#0b4cb4", "#146f3b", "#d97706", "#7c3aed", "#0891b2", "#db2777", "#65a30d", "#dc2626", "#475569", "#ca8a04", "#2563eb", "#059669"];
+import { PALETTE } from "@/lib/chart-palette";
+export { PALETTE };
 const axis = { fontSize: 12, fill: "#5a6479" };
 const grid = "#e2e8f2";
 const tip = { contentStyle: { borderRadius: 12, border: "1px solid #e2e8f2", boxShadow: "0 12px 28px -12px rgb(11 52 122 / .25)", fontSize: 13 } };
@@ -23,7 +24,7 @@ function Figure({ title, summary, height = 260, children, table }: {
 }) {
   return (
     <figure>
-      <div style={{ height }} aria-hidden>{children}</div>
+      <div style={{ height }} aria-hidden inert>{children}</div>
       <figcaption className="sr-only">{title}. {summary}</figcaption>
       {table && (
         <details className="group mt-3 text-sm">
@@ -201,13 +202,12 @@ export function Funnel({ data }: { data: { stage: string; value: number }[] }) {
   return (
     <ol className="space-y-2.5">
       {data.map((d, i) => {
-        const prev = i ? data[i - 1].value : null;
         const pct = Math.round((d.value / max) * 100);
         return (
           <li key={d.stage}>
             <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
               <span className="font-semibold text-ink">{d.stage}</span>
-              <span className="text-ink-3"><strong className="text-ink">{d.value.toLocaleString("en-NG")}</strong>{prev ? ` · ${Math.round((d.value / Math.max(prev, 1)) * 100)}% of previous` : ""}</span>
+              <span className="text-ink-3"><strong className="text-ink">{d.value.toLocaleString("en-NG")}</strong>{i > 0 ? ` · ${Math.min(100, Math.round((d.value / Math.max(data[0].value, 1)) * 100))}% of ${data[0].stage.toLowerCase()}` : ""}</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-sunken">
               <div className="h-full rounded-full bg-gradient-to-r from-brand-600 to-accent-500 transition-[width] duration-1000 ease-out" style={{ width: `${pct}%` }} />

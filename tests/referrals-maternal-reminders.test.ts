@@ -64,6 +64,15 @@ describe("referrals", () => {
     expect(h).toMatchObject({ blood_group: "O+", genotype: "AS" });
   });
 
+  it("tells only the permitted hospital how long its access lasts", async () => {
+    const [win] = await as(app, w.cardio.userId, (tx) => tx<{ active_count: number; expires_at: Date }[]>`select * from app.provider_access_window(${w.cardio.institutionId}, ${w.ada.patientId})`);
+    expect(win.active_count).toBeGreaterThan(0);
+    expect(new Date(win.expires_at).getTime()).toBeGreaterThan(Date.now());
+    // Staff of another institution can't probe someone else's access.
+    const other = await as(app, w.gp.userId, (tx) => tx`select * from app.provider_access_window(${w.cardio.institutionId}, ${w.ada.patientId})`);
+    expect(other).toHaveLength(0);
+  });
+
   it("lets the receiving hospital accept with an appointment, which books a reminder", async () => {
     const appt = new Date(Date.now() + 5 * 86_400_000).toISOString();
     await as(app, w.cardio.userId, (tx) => tx`select app.institution_respond_referral(${referral}, 'accepted', 'See you soon', ${appt}::timestamptz)`);

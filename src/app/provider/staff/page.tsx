@@ -64,7 +64,7 @@ export default async function StaffPage() {
                   {!s.is_me && s.status === "active" && (
                     <RolePickerDialog roles={roles} selected={roles.filter((r) => r.key === s.role_key).map((r) => r.id)} multiple={false} withReason={false}
                       title={`Change ${s.full_name}'s role`} description="Their access changes immediately. Clinical roles still need a verified licence."
-                      trigger={<button type="button" className="mt-1 text-xs font-semibold text-brand-600 hover:underline">Change role</button>}
+                      trigger={<button type="button" className="-ml-2 mt-0.5 inline-flex min-h-6 items-center rounded-md px-2 py-1 text-xs font-semibold text-brand-600 hover:bg-brand-50 hover:underline">Change role</button>}
                       onSave={setStaffRoleAction.bind(null, s.affiliation_id)} />
                   )}
                 </Td>

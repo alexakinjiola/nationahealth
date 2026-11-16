@@ -48,7 +48,7 @@ export function Reveal({ children, delay = 0, className, as: As = "div", from = 
   const offset = from === "left" ? "-translate-x-6" : from === "right" ? "translate-x-6" : from === "scale" ? "scale-[0.96]" : "translate-y-6";
   return (
     <As ref={ref as never} style={{ transitionDelay: `${delay}ms` }}
-      className={cn("transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+      className={cn("min-w-0 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
         hidden ? `opacity-0 ${offset}` : "opacity-100 translate-x-0 translate-y-0 scale-100", className)}>
       {children}
     </As>

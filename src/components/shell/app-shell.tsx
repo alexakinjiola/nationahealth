@@ -41,8 +41,8 @@ export function AppShell({
         <div className="min-w-0">
           <header className={"no-print sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line/80 bg-surface/85 px-4 backdrop-blur-md sm:px-6 lg:px-10"}>
             <MobileDrawer items={nav} dark={dark} header={<Logo href={home} inverted={dark} suffix={logoSuffix} />} footer={sidebarTop} />
-            <div className="lg:hidden"><Logo href={home} suffix={logoSuffix} /></div>
-            <div className="ml-auto flex items-center gap-1.5">{topRight}</div>
+            <div className="min-w-0 lg:hidden"><Logo href={home} suffix={logoSuffix} /></div>
+            <div className="ml-auto flex shrink-0 items-center gap-1.5">{topRight}</div>
           </header>
           <main id="main" tabIndex={-1} className={cn("mx-auto w-full max-w-[1240px] px-4 py-6 outline-none sm:px-6 sm:py-8 lg:px-10", bottomNav && "pb-28 lg:pb-10")}>
             {children}

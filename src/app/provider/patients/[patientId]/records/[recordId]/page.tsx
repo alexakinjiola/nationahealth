@@ -27,15 +27,15 @@ export default async function ProviderRecord({ params }: { params: Promise<{ pat
   const inst = current.institutionId;
   const { res, expiry } = await withActor(actor.userId, async (tx) => {
     const [{ r }] = await tx`select app.provider_get_record(${inst}, ${recordId}) as r`;
-    const [{ e }] = await tx`select min(expires_at) as e from permissions where id = any(app.active_permission_ids(${inst}, ${patientId}))`;
-    return { res: r, expiry: e };
+    const [w] = await tx`select expires_at from app.provider_access_window(${inst}, ${patientId})`;
+    return { res: r, expiry: w?.expires_at ?? null };
   }, await requestMeta());
   if (!res.allowed || res.record.patient_id !== patientId) {
     return <Card className="mx-auto max-w-xl"><EmptyState icon="lock" title="This record is outside your authorisation" action={<Button asChild variant="secondary"><Link href={`/provider/patients/${patientId}`}>Back to patient</Link></Button>}>{DENIAL_REASON[res.reason] ?? ""} The attempt was logged.</EmptyState></Card>;
   }
   const r = res.record;
   return (
-    <AccessGuard patientId={patientId} institutionId={inst} expiresAt={new Date(expiry).toISOString()}>
+    <AccessGuard patientId={patientId} institutionId={inst} expiresAt={expiry ? new Date(expiry).toISOString() : new Date().toISOString()}>
       <div className="animate-fade-in">
         <Link href={`/provider/patients/${patientId}`} className="inline-flex items-center gap-1 text-sm font-medium text-ink-3 hover:text-ink"><Icon name="arrow_back" size={18} />Patient records</Link>
         <header className="mt-4 pb-6"><p className="eyebrow">{CATEGORY[r.category_key]?.singular}</p>
